@@ -30,9 +30,8 @@
 
 (define (main args)
   (let* ((option-spec '((variant (single-char #\v) (value #t))))
-         (options (getopt-long (cdr args) option-spec)))
+         (options (getopt-long args option-spec)))
     (set! variant (option-ref options 'variant "ALL"))
-    (display stdin)
     (let ((pages (option-ref options '() '())))
       (map process-page pages))))
 
