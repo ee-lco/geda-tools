@@ -7,32 +7,15 @@
   (ice-9 regex)
   (ice-9 string-fun)
   (srfi srfi-1)
-  (mipmap gaf-utils))
-
-(define (option-ref-list options key default)
-  "Return list of matching values in alist OPTIONS using KEY, a symbol; or DEFAULT if not found."
-  (let ((vals (fold (lambda (x l)
-                      (if (eq? key (car x))
-                          (cons (cdr x) l)
-                          l))
-                    '() options)))
-    (if (null? vals) default vals)))
+  (mipmap file-utils)
+  (mipmap gaf-utils)
+  (mipmap getopt-utils))
 
 (define pages '())
 (define devmap-paths '())
 
-(define (open-devmap-file name)
-  (let ((
-    file
-    (or-map
-      (lambda (path)
-        (catch #t
-          (lambda () (open-input-file (string-append path (if (string-suffix? "/" path) "" "/") name)))
-          (lambda (key . args) #f)))
-      devmap-paths)))
-    (if (not file) (throw 'file-not-found-ex name))
-    file))
-
+(define (open-devmap-file filename)
+  (or (open-input-file-from-path filename devmap-paths) (throw 'file-not-found filename)))
 
 (define (read-devmap file)
   (let ((line (read-line file)))
@@ -99,84 +82,4 @@
       (map process-page pages))))
 
 (main (command-line))
-
-;(define has-devmap?
-;    (lambda (object)
-;        (not (null? (filter
-;            (lambda (attrib) (string=? (attrib-name attrib) "devmap"))
-;            (object-attribs object))))))
-
-;(define page (load-page! in_schem_file))
-
-;(display (page-contents page))
-;(display (filter component? (page-contents page)))
-;(display (filter has-devmap? (filter component? (page-contents page))))
-;(define build-devmap-path
-;    (lambda (path name)
-;(define find-devmap
-;    (lambda (devmap-name)
-;(define apply-devmap
-;    (lambda (page component devmap-attrib)
-;        (map
-;            (lambda (path)
-;                (display (string-append path (if (string-suffix? "/" path) "" "/") (attrib-value devmap-attrib) ".dev" "\n")))
-;            devmap-path)))
-;;        (display (string-append (basename (page-filename page)) " " (component-basename component) " " (attrib-value devmap-attrib) "\n"))))
-
-;(map
-;    (lambda (page-filename)
-;        (define page (load-page! page-filename))
-;        (map
-;            (lambda (component)
-;                (map
-;                    (lambda (attrib)
-;                        (if (string=? (attrib-name attrib) "devmap")
-;                            (apply-devmap page component attrib)))
-;                    (object-attribs component)))
-;            (filter component? (page-contents page)))
-;        (page-save-as! page (string-append page-filename "~")))
-;    pages)
-
-;(page-save-as! page out_schem_file)
-
-
-;(define find-devmap
-;    (lambda (object)
-;        (filter
-;            (lambda (attrib) (string=? (attrib-name attrib) "devmap"))
-;            (object-attribs object))))
-
-;(define has-devmap?
-;    (lambda (object)
-;        (not (null? (filter
-;            (lambda (attrib) (string=? (attrib-name attrib) "devmap"))
-;            (object-attribs object))))))
-
-;(define ot
-;    (lambda (o)
-;        (if (component? o) (display (string-append (component-basename o) "\n"))
-;        (if (text? o) (set-text-string! o "eelco")))))
-
-;(display (map component-basename (filter has-devmap? (filter component? (page-contents page1)))))
-
-;(define add-attr
-;    (lambda (page component devmap-attr attr-string)
-;        (let ((devmap-attr-info (text-info devmap-attr))
-;              (attr (make-text (list-ref devmap-attr-info 0) (list-ref devmap-attr-info 1) (list-ref devmap-attr-info 2) attr-string (list-ref devmap-attr-info 4) (list-ref devmap-attr-info 5) (list-ref devmap-attr-info 6) (list-ref devmap-attr-info 7))))
-;            (page-append! page attr)
-;            (attach-attribs! component attr))))
-
-;(define apply-devmap-cmd
-;    (lambda (page component devmap-attr cmd)
-;        (if (string=? (car cmd) "attr") (add-attr page component devmap-attr (cdr cmd))
-;        (if (string=? (car cmd) "del")  (del-attr page component devmap-attr (cdr cmd))))))
-
-;(add-attr (car (filter has-devmap? (filter component? (page-contents page1)))) "pietje=gek")
-;(map
-;    (lambda (obj)
-;        (if (object-component obj) (display (string-append (component-basename obj) "\n"))))
-;    (page-contents page1))
-
-;(display (page->string page1) (open-output-file "testschem.sch"))
-;(page-save-as! page1 out_schem_file)
 
