@@ -16,21 +16,22 @@
   ; with <var-spec> being a comma separated list of variants
   (let ((match (string-match "^[[]([^]]*)[]][[:space:]]*(.*)$" (attrib-value var-attrib))))
     (if match
-      ; Check if <var-spec> contains <variant>
-      (if (find (lambda (var) (string=? var variant)) (string-split (match:substring match 1) #\,))
-        (begin
-          ; Check if a <target-attrib> exists. If so, assign <new-attrib-value> to <target-attrib>
-          ; and delete <var-attrib>, otherwise assign <new-attrib-value> to <var-attrib>
-          ; A <target-attrib> should have the same attrib-name as <var-attrib> and
-          ; attrib-value "*"
-          (let ((target-attrib (object-filter-attribs component (attrib-name var-attrib) "*")))
-            (if (null? target-attrib)
-              (set-attrib-value! var-attrib (match:substring match 2))
-              (begin
-                (set-attrib-value! (car target-attrib) (match:substring match 2))
-                (remove-attrib! var-attrib)))))
-        ; No match, delete <var-attrib>
-        (remove-attrib! var-attrib)))))
+      (let ((var-spec (match:substring match 1)) (new-attrib-value (match:substring match 2)))
+        ; Check if <var-spec> contains <variant>
+        (if (find (lambda (var) (string=? var variant)) (string-split var-spec #\,))
+          (begin
+            ; Check if a <target-attrib> exists. If so, assign <new-attrib-value> to <target-attrib>
+            ; and delete <var-attrib>, otherwise assign <new-attrib-value> to <var-attrib>
+            ; A <target-attrib> has the same attrib-name as <var-attrib> and
+            ; attrib-value "*"
+            (let ((target-attrib (object-filter-attribs component (attrib-name var-attrib) "*")))
+              (if (null? target-attrib)
+                (set-attrib-value! var-attrib new-attrib-value)
+                (begin
+                  (set-attrib-value! (car target-attrib) new-attrib-value)
+                  (remove-attrib! var-attrib)))))
+          ; No match, delete <var-attrib>
+          (remove-attrib! var-attrib))))))
 
 ; Performs varmapping on all component attributes on <page>
 (define (process-page page variant)
