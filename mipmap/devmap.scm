@@ -11,7 +11,6 @@
   (mipmap gaf-utils)
   (mipmap getopt-utils))
 
-(define pages '())
 (define devmap-paths '())
 
 (define (open-devmap-file filename)
@@ -23,63 +22,38 @@
       '()
       (cons line (read-devmap file)))))
 
-(define (parse-devmap cmds)
-  (filter-map
-    (lambda (cmd)
-      (let ((match (string-match "^([A-Za-z0-9_-]+)[[:space:]]+(.*)$" cmd)))
-        (if match
-          (cond ((string=? (match:substring match 1) "attr") (list component-add-attrib (match:substring match 2)))
-                ((string=? (match:substring match 1) "delattr") (list component-del-attrib (match:substring match 2)))
-                (else (throw 'syntax-error cmd)))
-          (if (string-null? cmd) #f (throw 'syntax-error cmd)))))
-    cmds))
-
-(define (apply-devmap page component devmap-attrib)
-;  (let ((match (string-match "^([^:]*):(.*)$" (attrib-value devmap-attrib))))
-;    (if match
-;      (separate-fields-discarding-char "," (match:substring match 1))
-;    ; check if current variant is in comma-seperated list 'match 1'
-;    ; use entire attrib-value
+(define (parse-devmap component lines)
   (map
-    (lambda (cmd)
-      (apply (car cmd) (list page component devmap-attrib (cadr cmd))))
-    (parse-devmap (read-devmap (open-devmap-file (attrib-value devmap-attrib))))))
+    (lambda (line)
+      (let ((match (string-match "^([A-Za-z0-9_-]+)[[:space:]]+(.*)$" line)))
+        (if match
+          (let ((cmd (match:substring match 1))
+                (arg (match:substring match 2)))
+            (cond ((string=? cmd "attr") (component-add-attrib! component arg))
+                  ((string=? cmd "delattr") (map remove-attrib! (object-filter-attribs component arg)))
+                  (else (throw 'syntax-error line))))
+          (if (not (string-null? line)) (throw 'syntax-error cmd)))))
+    lines))
 
-(define (apply-pinmap page component pinmap-attrib)
-  (let ((match (string-match "^([^=]+)=(.*)$" (attrib-value pinmap-attrib))))
-    (if (not match) (throw 'syntax-error (text-string pinmap-attrib)))
-    (let ((oldpin (match:substring match 1))
-          (newpin (match:substring match 2)))
+(define (process-attrib component devmap-attrib)
+  (parse-devmap component (read-devmap (open-devmap-file (attrib-value devmap-attrib)))))
+
+; Performs devmapping on all component attributes on <page>
+(define (process-page page)
+  (map
+    (lambda (component)
       (map
-        (lambda (pin)
-          (map
-            (lambda (pinnumber)
-              (if (string=? (attrib-value pinnumber) oldpin)
-                 (set-attrib-value! pinnumber newpin)))
-            (object-filter-attribs pin "pinnumber")))
-        (filter pin? (component-contents component))))))
-
-(define (process-page page-name)
-  (let ((page (load-page! page-name)))
-    (map
-      (lambda (component)
-        (map
-          (lambda (devmap)
-            (apply-devmap page component devmap))
-          (object-filter-attribs component "devmap"))
-        (map
-          (lambda (pinmap)
-            (apply-pinmap page component pinmap))
-          (object-filter-attribs component "pinmap")))
-      (filter component? (page-contents page)))
-    (page-save! page)))
+        (lambda (devmap-attrib) (process-attrib component devmap-attrib))
+        (object-filter-attribs component "devmap")))
+    (filter component? (page-contents page))))
 
 (define (main args)
   (let* ((option-spec '((lib     (single-char #\L) (value #t))))
-         (options (getopt-long args option-spec)))
+         (options (getopt-long args option-spec))
+         (page (string->page "STDIN" (read-delimited "" (current-input-port)))))
     (set! devmap-paths (option-ref-list options 'lib '()))
-    (let ((pages (option-ref options '() '())))
-      (map process-page pages))))
+    (process-page page)
+    (display (page->string page))))
 
 (main (command-line))
 

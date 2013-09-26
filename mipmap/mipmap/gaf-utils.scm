@@ -5,8 +5,7 @@
   #:use-module (ice-9 rdelim)
   #:export (load-page! page-save! page-save-as!)
   #:export (object-filter-attribs)
-  #:export (component-add-attrib component-del-attrib)
-  #:export (remove-attrib!))
+  #:export (component-add-attrib! remove-attrib!))
 
 ; Creates a gEDA <page> from the file <filename>
 (define (load-page! filename)
@@ -28,26 +27,15 @@
       (lambda (attrib)
         (and
           (string=? (attrib-name attrib) name)
-          (if (null? value) #t (string=? (attrib-value attrib) value))))
+          (if value (string=? (attrib-value attrib) value) #t)))
       (object-attribs object))))
 
-; Deprecated
-(define (component-add-attrib page component devmap-attrib attrib-string)
-  (let ((attrib (apply make-text (text-info devmap-attrib))))
-    (set-text-string! attrib attrib-string)
+; Adds an attribute with the string <attrib-name>=<attrib-value> to <component>
+(define (component-add-attrib! component attrib-string)
+  (let ((attrib (make-text (component-position component) 'lower-left 0 attrib-string 10 #f 'both 5))
+        (page (object-page component)))
     (page-append! page attrib)
     (attach-attribs! component attrib)))
-
-; Deprecated
-(define (component-del-attrib page component devmap-attrib attrib-string)
-  (map
-    (lambda (attrib)
-      (detach-attribs! component attrib)
-      (page-remove! page attrib))
-    (filter
-      (lambda (attrib)
-        (string=? (attrib-name attrib) attrib-string))
-      (object-attribs component))))
 
 ; Removes <attrib> from its associated page.
 (define (remove-attrib! attrib)

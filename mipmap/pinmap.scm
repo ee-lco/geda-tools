@@ -11,9 +11,7 @@
   (mipmap gaf-utils)
   (mipmap getopt-utils))
 
-(define pages '())
-
-(define (apply-pinmap page component pinmap-attrib)
+(define (process-attrib component pinmap-attrib)
   (let ((match (string-match "^([^=]+)=(.*)$" (attrib-value pinmap-attrib))))
     (if (not match) (throw 'syntax-error (text-string pinmap-attrib)))
     (let ((oldpin (match:substring match 1))
@@ -27,22 +25,22 @@
             (object-filter-attribs pin "pinnumber")))
         (filter pin? (component-contents component))))))
 
-(define (process-page page-name)
-  (let ((page (load-page! page-name)))
-    (map
-      (lambda (component)
-        (map
-          (lambda (pinmap)
-            (apply-pinmap page component pinmap))
-          (object-filter-attribs component "pinmap")))
-      (filter component? (page-contents page)))
-    (page-save! page)))
+; Performs pinmapping on all component attributes on <page>
+(define (process-page page)
+  (map
+    (lambda (component)
+      (map
+        (lambda (pinmap)
+          (process-attrib component pinmap))
+        (object-filter-attribs component "pinmap")))
+    (filter component? (page-contents page))))
 
 (define (main args)
   (let* ((option-spec '())
-         (options (getopt-long args option-spec)))
-    (let ((pages (option-ref options '() '())))
-      (map process-page pages))))
+         (options (getopt-long args option-spec))
+         (page (string->page "STDIN" (read-delimited "" (current-input-port)))))
+    (process-page page)
+    (display (page->string page))))
 
 (main (command-line))
 
