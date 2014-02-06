@@ -31,6 +31,7 @@
                 (arg (match:substring match 2)))
             (cond ((string=? cmd "attr") (component-add-attrib! component arg))
                   ((string=? cmd "delattr") (map remove-attrib! (object-filter-attribs component arg)))
+                  ((string=? cmd "include") (parse-devmap component (read-devmap (open-devmap-file arg))))
                   (else (throw 'syntax-error line))))
           (if (not (string-null? line)) (throw 'syntax-error cmd)))))
     lines))
