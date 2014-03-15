@@ -4,7 +4,7 @@ lib_LTLIBRARIES = libgedaruby.la
 
 # don't forget all *.h files */
 libgedaruby_la_SOURCES = \
-	geda-ruby.c
+	ruby_geda.c ruby_toplevel.c ruby_page.c ruby_object.c ruby_init.c
 
 libgedaruby_la_CPPFLAGS = $(RUBY_CPPFLAGS)
 libgedaruby_la_CFLAGS = $(GCC_CFLAGS) $(GLIB_CFLAGS) $(GDK_PIXBUF_CFLAGS)

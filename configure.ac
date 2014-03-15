@@ -1,7 +1,7 @@
 AC_INIT([geda-ruby], [1.0])
 AC_PREREQ([2.60])
 
-AC_CONFIG_SRCDIR([src/geda-ruby.c])
+AC_CONFIG_SRCDIR([src/ruby_geda.c])
 AC_CONFIG_AUX_DIR([build-tools])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
