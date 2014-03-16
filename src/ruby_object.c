@@ -42,7 +42,7 @@ VALUE ruby_text_class;
 static VALUE ruby_text_initialize(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_text_set(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_text_anchor_get(VALUE self);
-static VALUE ruby_text_anchor_set(VALUE self, VALUE anchor);
+static VALUE ruby_text_anchor_set(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_text_alignment_get(VALUE self);
 static VALUE ruby_text_alignment_set(VALUE self, VALUE alignment);
 static VALUE ruby_text_angle_get(VALUE self);
@@ -66,6 +66,19 @@ static VALUE ruby_attrib_detach(VALUE self);
 static VALUE ruby_attrib_inherited_get(VALUE self);
 
 VALUE ruby_component_class;
+static VALUE ruby_component_set(VALUE self, VALUE position, VALUE angle, VALUE mirror, VALUE locked);
+static VALUE ruby_component_basename_get(VALUE self);
+static VALUE ruby_component_position_get(VALUE self);
+static VALUE ruby_component_position_set(int argc, VALUE argv[], VALUE self);
+static VALUE ruby_component_angle_get(VALUE self);
+static VALUE ruby_component_angle_set(VALUE self, VALUE angle);
+static VALUE ruby_component_mirror_get(VALUE self);
+static VALUE ruby_component_mirror_set(VALUE self, VALUE mirror);
+static VALUE ruby_component_locked_get(VALUE self);
+static VALUE ruby_component_locked_set(VALUE self, VALUE locked);
+static VALUE ruby_component_contents_each(VALUE self);
+static VALUE ruby_component_append(int argc, VALUE argv[], VALUE self);
+static VALUE ruby_component_remove(int argc, VALUE argv[] , VALUE self);
 
 
 VALUE ruby_object_from_c(OBJECT *object)
@@ -218,7 +231,7 @@ static VALUE ruby_object_component_get(VALUE self)
     TOPLEVEL *toplevel;
     OBJECT *object;
     OBJECT *parent;
-    
+
     toplevel = ruby_get_c_toplevel();
     object = ruby_object_to_c(self);
     parent = o_get_parent(toplevel, object);
@@ -234,7 +247,7 @@ static VALUE ruby_object_page_get(VALUE self)
     TOPLEVEL *toplevel;
     OBJECT *object;
     PAGE *page;
-    
+
     toplevel = ruby_get_c_toplevel();
     object = ruby_object_to_c(self);
     page = o_get_page(toplevel, object);
@@ -320,7 +333,7 @@ static VALUE ruby_text_set(int argc, VALUE argv[], VALUE self)
 
     rb_scan_args(argc, argv, "71", &anchor, &alignment, &angle, &string, &size, &visible, &show, &color);
 
-    ruby_text_anchor_set(self, anchor);
+    ruby_text_anchor_set(1, &anchor, self);
     ruby_text_alignment_set(self, alignment);
     ruby_text_angle_set(self, angle);
     ruby_text_string_set(self, string);
@@ -344,16 +357,16 @@ static VALUE ruby_text_anchor_get(VALUE self)
     return rb_funcall(ruby_vector_class, rb_intern("new"), 2, x, y);
 }
 
-static VALUE ruby_text_anchor_set(VALUE self, VALUE anchor)
+static VALUE ruby_text_anchor_set(int argc, VALUE argv[], VALUE self)
 {
     OBJECT *object;
-    VALUE vector;
+    VALUE anchor;
 
     object = ruby_object_to_c(self);
-    vector = rb_funcall(ruby_vector_class, rb_intern("new"), 1, anchor);
+    anchor = rb_funcall2(ruby_vector_class, rb_intern("new"), argc, argv);
 
-    object->text->x = NUM2INT(rb_funcall(vector, rb_intern("x"), 0));
-    object->text->y = NUM2INT(rb_funcall(vector, rb_intern("y"), 0));
+    object->text->x = NUM2INT(rb_funcall(anchor, rb_intern("x"), 0));
+    object->text->y = NUM2INT(rb_funcall(anchor, rb_intern("y"), 0));
 
     return self;
 }
@@ -603,7 +616,7 @@ static VALUE ruby_attrib_value_set(VALUE self, VALUE value)
 static VALUE ruby_attrib_attachment_get(VALUE self)
 {
     OBJECT *object;
-    
+
     object = ruby_object_to_c(self);
 
     if (!object->attached_to) {
@@ -660,6 +673,182 @@ static VALUE ruby_attrib_inherited_get(VALUE self)
     return Qfalse;
 }
 
+static VALUE ruby_component_set(VALUE self, VALUE position, VALUE angle, VALUE mirror, VALUE locked)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    ruby_component_position_set(1, &position, self);
+    ruby_component_angle_set(self, angle);
+    ruby_component_mirror_set(self, mirror);
+    ruby_component_locked_set(self, locked);
+}
+
+static VALUE ruby_component_basename_get(VALUE self)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    return rb_str_new2(object->complex_basename);
+}
+
+static VALUE ruby_component_position_get(VALUE self)
+{
+    OBJECT *object;
+    VALUE x, y;
+
+    object = ruby_object_to_c(self);
+    x = INT2FIX(object->complex->x);
+    y = INT2FIX(object->complex->y);
+
+    return rb_funcall(ruby_vector_class, rb_intern("new"), 2, x, y);
+}
+
+static VALUE ruby_component_position_set(int argc, VALUE argv[], VALUE self)
+{
+    OBJECT *object;
+    VALUE position;
+
+    object = ruby_object_to_c(self);
+    position = rb_funcall2(ruby_vector_class, rb_intern("new"), argc, argv);
+
+    object->complex->x = NUM2INT(rb_funcall(position, rb_intern("x"), 0));
+    object->complex->y = NUM2INT(rb_funcall(position, rb_intern("y"), 0));
+
+    return self;
+}
+
+static VALUE ruby_component_angle_get(VALUE self)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    return INT2NUM(object->complex->angle);
+}
+
+static VALUE ruby_component_angle_set(VALUE self, VALUE angle)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    Check_Type(angle, T_FIXNUM);
+    switch (NUM2INT(angle)) {
+    case 0:
+    case 90:
+    case 180:
+    case 270:
+        break;
+    default:
+        ///@todo
+        break;
+    }
+
+    object->complex->angle = NUM2INT(angle);
+
+    return self;
+}
+
+static VALUE ruby_component_mirror_get(VALUE self)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    return (object->complex->mirror) ? Qtrue : Qfalse;
+}
+
+static VALUE ruby_component_mirror_set(VALUE self, VALUE mirror)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    object->complex->mirror = RTEST(mirror) ? 1 : 0;
+
+    return self;
+}
+
+static VALUE ruby_component_locked_get(VALUE self)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    return (object->selectable) ? Qtrue : Qfalse;
+}
+
+static VALUE ruby_component_locked_set(VALUE self, VALUE locked)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    object->selectable = RTEST(locked) ? 1 : 0;
+
+    return self;
+}
+
+static VALUE ruby_component_contents_each(VALUE self)
+{
+    OBJECT *object;
+
+    object = ruby_object_to_c(self);
+
+    GList *object_list = object->complex->prim_objs;
+    while (object_list != NULL) {
+        rb_yield(ruby_object_from_c(object_list->data));
+        object_list = g_list_next(object_list);
+    }
+
+    return Qnil;
+}
+
+static VALUE ruby_component_append(int argc, VALUE argv[], VALUE self)
+{
+    OBJECT *object;
+    OBJECT *child;
+    int i;
+
+    object = ruby_object_to_c(self);
+
+    for (i = 0; i < argc; i++) {
+        child = ruby_object_to_c(argv[i]);
+
+        ///@todo
+
+        g_list_append(object->complex->prim_objs, child);
+        child->parent = object;
+    }
+    ///@todo
+
+    return Qnil;
+}
+
+static VALUE ruby_component_remove(int argc, VALUE argv[] , VALUE self)
+{
+    OBJECT *object;
+    OBJECT *child;
+    int i;
+
+    object = ruby_object_to_c(self);
+
+    for (i = 0; i < argc; i++) {
+        child = ruby_object_to_c(argv[i]);
+
+        ///@todo
+
+        g_list_remove_all(object->complex->prim_objs, child);
+        child->parent = NULL;
+    }
+    ///@todo
+
+    return Qnil;
+}
+
 void ruby_object_init(void)
 {
     ruby_object_class = rb_define_class_under(ruby_geda_module, "Object", rb_cObject);
@@ -700,6 +889,7 @@ void ruby_object_init(void)
     ruby_text_class = rb_define_class_under(ruby_geda_module, "Text", ruby_object_class);
     rb_define_method(ruby_text_class, "set", ruby_text_set, -1);
     rb_define_method(ruby_text_class, "anchor", ruby_text_anchor_get, 0);
+    rb_define_method(ruby_text_class, "anchor=", ruby_text_anchor_set, -1);
     rb_define_method(ruby_text_class, "alignment", ruby_text_alignment_get, 0);
     rb_define_method(ruby_text_class, "angle", ruby_text_angle_get, 0);
     rb_define_method(ruby_text_class, "string", ruby_text_string_get, 0);
@@ -721,15 +911,22 @@ void ruby_object_init(void)
     rb_define_method(ruby_attrib_class, "inherited?", ruby_attrib_inherited_get, 0);
 
     ruby_component_class = rb_define_class_under(ruby_geda_module, "Component", ruby_object_class);
-    //basename
-    //position
-    //angle
-    //mirror?
-    //locked?
-    //append!
-    //remove!
-    //inherited-attribs
-    //promotable-attribs
-    //promote-attribs!
+    //rb_define_method(ruby_component_class, "initialize", ruby_component_initialize, 5);
+    rb_define_method(ruby_component_class, "set", ruby_component_set, 4);
+    rb_define_method(ruby_component_class, "basename", ruby_component_basename_get, 0);
+    rb_define_method(ruby_component_class, "position", ruby_component_position_get, 0);
+    rb_define_method(ruby_component_class, "position", ruby_component_position_set, 1);
+    rb_define_method(ruby_component_class, "angle", ruby_component_angle_get, 0);
+    rb_define_method(ruby_component_class, "angle", ruby_component_angle_set, 1);
+    rb_define_method(ruby_component_class, "mirror", ruby_component_mirror_get, 0);
+    rb_define_method(ruby_component_class, "mirror", ruby_component_mirror_set, 1);
+    rb_define_method(ruby_component_class, "locked", ruby_component_locked_get, 0);
+    rb_define_method(ruby_component_class, "locked", ruby_component_locked_set, 1);
+    rb_define_method(ruby_component_class, "contents", ruby_component_contents_each, 0);
+    rb_define_method(ruby_component_class, "append!", ruby_component_append, -1);
+    rb_define_method(ruby_component_class, "remove!", ruby_component_remove, -1);
+    //rb_define_method(ruby_component_class, "inheritable_attribs", ruby_component_inheritable_attribs_each, 0);
+    //rb_define_method(ruby_component_class, "promotable_attribs", ruby_component_inheritable_attribs_each, 0);
+    //rb_define_method(ruby_component_class, "promote_attribs!", ruby_component_promote_attribs, -1);
 }
 

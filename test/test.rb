@@ -23,5 +23,8 @@ p3.contents { |object|
     if (object.class == GEDA::Attrib)
 #        puts("#{object.name}=#{object.value}")
     end
+    if (object.class == GEDA::Component)
+        puts("#{object.basename}")
+    end
 }
 

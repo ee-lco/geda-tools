@@ -37,7 +37,7 @@ static VALUE ruby_page_alloc(VALUE class)
 {
     TOPLEVEL *toplevel;
     PAGE *page;
-    
+
     toplevel = ruby_get_c_toplevel();
     page = s_page_new(ruby_get_c_toplevel(), "untitled");
 
@@ -66,7 +66,7 @@ static VALUE ruby_page_pages_index(VALUE class, VALUE key)
     unsigned index;
     char *filename;
     VALUE page;
-    
+
     toplevel = ruby_get_c_toplevel();
 
     GList *page_list = geda_list_get_glist(toplevel->pages);
@@ -94,7 +94,7 @@ static VALUE ruby_page_pages_index(VALUE class, VALUE key)
 static VALUE ruby_page_pages_each(VALUE self)
 {
     TOPLEVEL *toplevel;
-    
+
     toplevel = ruby_get_c_toplevel();
 
     GList *page_list = geda_list_get_glist(toplevel->pages);
@@ -129,7 +129,7 @@ static VALUE ruby_page_initialize(int argc, VALUE argv[], VALUE self)
 static VALUE ruby_page_contents_each(VALUE self)
 {
     PAGE *page;
-    
+
     page = ruby_page_to_c(self);
 
     const GList *object_list = s_page_objects(page);
@@ -147,7 +147,7 @@ static VALUE ruby_page_append(int argc, VALUE argv[], VALUE self)
     PAGE *page;
     OBJECT *object;
     int i;
-    
+
     toplevel = ruby_get_c_toplevel();
     page = ruby_page_to_c(self);
 
@@ -158,7 +158,6 @@ static VALUE ruby_page_append(int argc, VALUE argv[], VALUE self)
 
         s_page_append(toplevel, page, object);
     }
-
     page->CHANGED = 1;
 
     return Qnil;
@@ -170,7 +169,7 @@ static VALUE ruby_page_remove(int argc, VALUE argv[] , VALUE self)
     PAGE *page;
     OBJECT *object;
     int i;
-    
+
     toplevel = ruby_get_c_toplevel();
     page = ruby_page_to_c(self);
 
@@ -189,7 +188,7 @@ static VALUE ruby_page_remove(int argc, VALUE argv[] , VALUE self)
 static VALUE ruby_page_get_filename(VALUE self)
 {
     PAGE *page;
-    
+
     page = ruby_page_to_c(self);
 
     return rb_str_new2(page->page_filename);
@@ -199,7 +198,7 @@ static VALUE ruby_page_set_filename(VALUE self, VALUE filename)
 {
     PAGE *page;
     char *page_filename;
-    
+
     Check_Type(filename, T_STRING);
 
     page = ruby_page_to_c(self);
@@ -224,7 +223,7 @@ static VALUE ruby_page_set_filename(VALUE self, VALUE filename)
 static VALUE ruby_page_get_dirty(VALUE self)
 {
     PAGE *page;
-    
+
     page = ruby_page_to_c(self);
 
     return page->CHANGED ? Qtrue : Qfalse;
@@ -233,7 +232,7 @@ static VALUE ruby_page_get_dirty(VALUE self)
 static VALUE ruby_page_set_dirty(VALUE self, VALUE dirty)
 {
     PAGE *page;
-   
+
     page = ruby_page_to_c(self);
 
     page->CHANGED = RTEST(dirty) ? 1 : 0;
