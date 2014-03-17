@@ -94,16 +94,29 @@ static VALUE ruby_page_pages_index(VALUE class, VALUE key)
 static VALUE ruby_page_pages_each(VALUE self)
 {
     TOPLEVEL *toplevel;
+    VALUE pages;
 
     toplevel = ruby_get_c_toplevel();
 
-    GList *page_list = geda_list_get_glist(toplevel->pages);
-    while (page_list != NULL) {
-        rb_yield(ruby_page_from_c(page_list->data));
-        page_list = g_list_next(page_list);
-    }
+    if (rb_block_given_p()) {
+        GList *page_list = g_list_copy(geda_list_get_glist(toplevel->pages));
+        while (page_list != NULL) {
+            rb_yield(ruby_page_from_c(page_list->data));
+            page_list = g_list_next(page_list);
+        }
+        g_list_free(page_list);
 
-    return Qnil;
+        return Qnil;
+    } else {
+        pages = rb_ary_new();
+        GList *page_list = geda_list_get_glist(toplevel->pages);
+        while (page_list != NULL) {
+            rb_ary_push(pages, ruby_page_from_c(page_list->data));
+            page_list = g_list_next(page_list);
+        }
+
+        return pages;
+    }
 }
 
 
@@ -129,16 +142,29 @@ static VALUE ruby_page_initialize(int argc, VALUE argv[], VALUE self)
 static VALUE ruby_page_contents_each(VALUE self)
 {
     PAGE *page;
+    VALUE objects;
 
     page = ruby_page_to_c(self);
 
-    const GList *object_list = s_page_objects(page);
-    while (object_list != NULL) {
-        rb_yield(ruby_object_from_c(object_list->data));
-        object_list = g_list_next(object_list);
-    }
+    if (rb_block_given_p()) {
+        GList *object_list = g_list_copy(s_page_objects(page));
+        while (object_list != NULL) {
+            rb_yield(ruby_object_from_c(object_list->data));
+            object_list = g_list_next(object_list);
+        }
+        g_list_free(object_list);
 
-    return Qnil;
+        return Qnil;
+    } else {
+        objects = rb_ary_new();
+        GList *object_list = s_page_objects(page);
+        while (object_list != NULL) {
+            rb_ary_push(objects, ruby_object_from_c(object_list->data));
+            object_list = g_list_next(object_list);
+        }
+
+        return objects;
+    }
 }
 
 static VALUE ruby_page_append(int argc, VALUE argv[], VALUE self)

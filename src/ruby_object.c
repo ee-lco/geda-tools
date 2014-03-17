@@ -157,19 +157,30 @@ static void ruby_object_free(void *obj)
 
 static VALUE ruby_object_attribs_each(VALUE self)
 {
-    TOPLEVEL *toplevel;
     OBJECT *object;
+    VALUE attribs;
 
-    toplevel = ruby_get_c_toplevel();
     object = ruby_object_to_c(self);
 
-    GList *attrib_list = object->attribs;
-    while (attrib_list != NULL) {
-        rb_yield(ruby_attrib_from_c(attrib_list->data));
-        attrib_list = g_list_next(attrib_list);
-    }
+    if (rb_block_given_p()) {
+        GList *attrib_list = g_list_copy(object->attribs);
+        while (attrib_list != NULL) {
+            rb_yield(ruby_object_from_c(attrib_list->data));
+            attrib_list = g_list_next(attrib_list);
+        }
+        g_list_free(attrib_list);
 
-    return Qnil;
+        return Qnil;
+     } else {
+        attribs = rb_ary_new();
+        GList *attrib_list = object->attribs;
+        while (attrib_list != NULL) {
+            rb_ary_push(attribs, ruby_object_from_c(attrib_list->data));
+            attrib_list = g_list_next(attrib_list);
+        }
+
+        return attribs;
+    }
 }
 
 static VALUE ruby_object_attach_attribs(int argc, VALUE argv[], VALUE self)
@@ -195,6 +206,7 @@ static VALUE ruby_object_connections_each(VALUE self)
     TOPLEVEL *toplevel;
     OBJECT *object;
     PAGE *page;
+    VALUE connections;
 
     toplevel = ruby_get_c_toplevel();
     object = ruby_object_to_c(self);
@@ -204,13 +216,25 @@ static VALUE ruby_object_connections_each(VALUE self)
         ///@todo
     }
 
-    GList *connection_list = s_conn_return_others(NULL, object);
-    while (connection_list != NULL) {
-        rb_yield(ruby_object_from_c(connection_list->data));
-        connection_list = g_list_next(connection_list);
-    }
+    if (rb_block_given_p()) {
+        GList *connection_list = g_list_copy(s_conn_return_others(NULL, object));
+        while (connection_list != NULL) {
+            rb_yield(ruby_object_from_c(connection_list->data));
+            connection_list = g_list_next(connection_list);
+        }
+        g_list_free(connection_list);
 
-    return Qnil;
+        return Qnil;
+    } else {
+        connections = rb_ary_new();
+        GList *connection_list = s_conn_return_others(NULL, object);
+        while (connection_list != NULL) {
+            rb_ary_push(connections, ruby_object_from_c(connection_list->data));
+            connection_list = g_list_next(connection_list);
+        }
+
+        return connections;
+    }
 }
 
 static VALUE ruby_object_copy(VALUE self)
@@ -286,8 +310,8 @@ static VALUE ruby_vector_initialize(int argc, VALUE argv[], VALUE self)
         ///@todo
     }
 
-    rb_iv_set(self, "@x", x);
-    rb_iv_set(self, "@y", y);
+    ruby_vector_x_set(self, x);
+    ruby_vector_y_set(self, y);
 
     return self;
 }
@@ -660,10 +684,8 @@ static VALUE ruby_attrib_detach(VALUE self)
 
 static VALUE ruby_attrib_inherited_get(VALUE self)
 {
-    TOPLEVEL *toplevel;
     OBJECT *object;
 
-    toplevel = ruby_get_c_toplevel();
     object = ruby_object_to_c(self);
 
     if (!object->attached_to && object->parent) {
@@ -795,16 +817,29 @@ static VALUE ruby_component_locked_set(VALUE self, VALUE locked)
 static VALUE ruby_component_contents_each(VALUE self)
 {
     OBJECT *object;
+    VALUE objects;
 
     object = ruby_object_to_c(self);
 
-    GList *object_list = object->complex->prim_objs;
-    while (object_list != NULL) {
-        rb_yield(ruby_object_from_c(object_list->data));
-        object_list = g_list_next(object_list);
-    }
+    if (rb_block_given_p()) {
+        GList *object_list = g_list_copy(object->complex->prim_objs);
+        while (object_list != NULL) {
+            rb_yield(ruby_object_from_c(object_list->data));
+            object_list = g_list_next(object_list);
+        }
+        g_list_free(object_list);
 
-    return Qnil;
+        return Qnil;
+    } else {
+        objects = rb_ary_new();
+        GList *object_list = object->complex->prim_objs;
+        while (object_list != NULL) {
+            rb_ary_push(objects, ruby_object_from_c(object_list->data));
+            object_list = g_list_next(object_list);
+        }
+
+        return objects;
+    }
 }
 
 static VALUE ruby_component_append(int argc, VALUE argv[], VALUE self)
