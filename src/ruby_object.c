@@ -5,10 +5,10 @@ VALUE ruby_object_class;
 static VALUE ruby_object_alloc(VALUE class);
 static void ruby_object_mark(void *obj);
 static void ruby_object_free(void *obj);
-static VALUE ruby_object_attribs_each(VALUE self);
+static VALUE ruby_object_attribs_get(VALUE self);
 static VALUE ruby_object_attach_attribs(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_object_detach_attribs(int argc, VALUE argv[], VALUE self);
-static VALUE ruby_object_connections_each(VALUE self);
+static VALUE ruby_object_connections_get(VALUE self);
 static VALUE ruby_object_copy(VALUE self);
 static VALUE ruby_object_component_get(VALUE self);
 static VALUE ruby_object_page_get(VALUE self);
@@ -76,7 +76,7 @@ static VALUE ruby_component_mirror_get(VALUE self);
 static VALUE ruby_component_mirror_set(VALUE self, VALUE mirror);
 static VALUE ruby_component_locked_get(VALUE self);
 static VALUE ruby_component_locked_set(VALUE self, VALUE locked);
-static VALUE ruby_component_contents_each(VALUE self);
+static VALUE ruby_component_contents_get(VALUE self);
 static VALUE ruby_component_append(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_component_remove(int argc, VALUE argv[] , VALUE self);
 
@@ -145,42 +145,29 @@ OBJECT *ruby_object_to_c(VALUE object)
 
 static void ruby_object_mark(void *obj)
 {
-//fprintf(stderr, "%s(%p)\n", __func__, obj);
     ///@todo
 }
 
 static void ruby_object_free(void *obj)
 {
-//fprintf(stderr, "%s(%p)\n", __func__, obj);
     ///@todo
 }
 
-static VALUE ruby_object_attribs_each(VALUE self)
+static VALUE ruby_object_attribs_get(VALUE self)
 {
     OBJECT *object;
     VALUE attribs;
 
     object = ruby_object_to_c(self);
 
-    if (rb_block_given_p()) {
-        GList *attrib_list = g_list_copy(object->attribs);
-        while (attrib_list != NULL) {
-            rb_yield(ruby_object_from_c(attrib_list->data));
-            attrib_list = g_list_next(attrib_list);
-        }
-        g_list_free(attrib_list);
-
-        return Qnil;
-     } else {
-        attribs = rb_ary_new();
-        GList *attrib_list = object->attribs;
-        while (attrib_list != NULL) {
-            rb_ary_push(attribs, ruby_object_from_c(attrib_list->data));
-            attrib_list = g_list_next(attrib_list);
-        }
-
-        return attribs;
+    attribs = rb_ary_new();
+    GList *attrib_list = object->attribs;
+    while (attrib_list != NULL) {
+        rb_ary_push(attribs, ruby_object_from_c(attrib_list->data));
+        attrib_list = g_list_next(attrib_list);
     }
+
+    return attribs;
 }
 
 static VALUE ruby_object_attach_attribs(int argc, VALUE argv[], VALUE self)
@@ -201,7 +188,7 @@ static VALUE ruby_object_detach_attribs(int argc, VALUE argv[], VALUE self)
     }
 }
 
-static VALUE ruby_object_connections_each(VALUE self)
+static VALUE ruby_object_connections_get(VALUE self)
 {
     TOPLEVEL *toplevel;
     OBJECT *object;
@@ -216,25 +203,14 @@ static VALUE ruby_object_connections_each(VALUE self)
         ///@todo
     }
 
-    if (rb_block_given_p()) {
-        GList *connection_list = g_list_copy(s_conn_return_others(NULL, object));
-        while (connection_list != NULL) {
-            rb_yield(ruby_object_from_c(connection_list->data));
-            connection_list = g_list_next(connection_list);
-        }
-        g_list_free(connection_list);
-
-        return Qnil;
-    } else {
-        connections = rb_ary_new();
-        GList *connection_list = s_conn_return_others(NULL, object);
-        while (connection_list != NULL) {
-            rb_ary_push(connections, ruby_object_from_c(connection_list->data));
-            connection_list = g_list_next(connection_list);
-        }
-
-        return connections;
+    connections = rb_ary_new();
+    GList *connection_list = s_conn_return_others(NULL, object);
+    while (connection_list != NULL) {
+        rb_ary_push(connections, ruby_object_from_c(connection_list->data));
+        connection_list = g_list_next(connection_list);
     }
+
+    return connections;
 }
 
 static VALUE ruby_object_copy(VALUE self)
@@ -814,32 +790,21 @@ static VALUE ruby_component_locked_set(VALUE self, VALUE locked)
     return self;
 }
 
-static VALUE ruby_component_contents_each(VALUE self)
+static VALUE ruby_component_contents_get(VALUE self)
 {
     OBJECT *object;
     VALUE objects;
 
     object = ruby_object_to_c(self);
 
-    if (rb_block_given_p()) {
-        GList *object_list = g_list_copy(object->complex->prim_objs);
-        while (object_list != NULL) {
-            rb_yield(ruby_object_from_c(object_list->data));
-            object_list = g_list_next(object_list);
-        }
-        g_list_free(object_list);
-
-        return Qnil;
-    } else {
-        objects = rb_ary_new();
-        GList *object_list = object->complex->prim_objs;
-        while (object_list != NULL) {
-            rb_ary_push(objects, ruby_object_from_c(object_list->data));
-            object_list = g_list_next(object_list);
-        }
-
-        return objects;
+    objects = rb_ary_new();
+    GList *object_list = object->complex->prim_objs;
+    while (object_list != NULL) {
+        rb_ary_push(objects, ruby_object_from_c(object_list->data));
+        object_list = g_list_next(object_list);
     }
+
+    return objects;
 }
 
 static VALUE ruby_component_append(int argc, VALUE argv[], VALUE self)
@@ -888,10 +853,10 @@ void ruby_object_init(void)
 {
     ruby_object_class = rb_define_class_under(ruby_geda_module, "Object", rb_cObject);
     //rb_define_alloc_func(ruby_object_class, ruby_object_alloc);
-    rb_define_method(ruby_object_class, "attribs", ruby_object_attribs_each, 0);
+    rb_define_method(ruby_object_class, "attribs", ruby_object_attribs_get, 0);
     rb_define_method(ruby_object_class, "attach_attribs!", ruby_object_attach_attribs, -1);
     rb_define_method(ruby_object_class, "detach_attribs!", ruby_object_detach_attribs, -1);
-    rb_define_method(ruby_object_class, "connections", ruby_object_connections_each, 0);
+    rb_define_method(ruby_object_class, "connections", ruby_object_connections_get, 0);
     rb_define_method(ruby_object_class, "copy", ruby_object_copy, 0);
     rb_define_method(ruby_object_class, "component", ruby_object_component_get, 0);
     rb_define_method(ruby_object_class, "page", ruby_object_page_get, 0);
@@ -926,7 +891,9 @@ void ruby_object_init(void)
     rb_define_method(ruby_text_class, "anchor", ruby_text_anchor_get, 0);
     rb_define_method(ruby_text_class, "anchor=", ruby_text_anchor_set, -1);
     rb_define_method(ruby_text_class, "alignment", ruby_text_alignment_get, 0);
+    rb_define_method(ruby_text_class, "alignment=", ruby_text_alignment_set, 1);
     rb_define_method(ruby_text_class, "angle", ruby_text_angle_get, 0);
+    rb_define_method(ruby_text_class, "angle=", ruby_text_angle_set, 1);
     rb_define_method(ruby_text_class, "string", ruby_text_string_get, 0);
     rb_define_method(ruby_text_class, "string=", ruby_text_string_set, 1);
     rb_define_method(ruby_text_class, "size", ruby_text_size_get, 0);
@@ -957,11 +924,11 @@ void ruby_object_init(void)
     rb_define_method(ruby_component_class, "mirror", ruby_component_mirror_set, 1);
     rb_define_method(ruby_component_class, "locked", ruby_component_locked_get, 0);
     rb_define_method(ruby_component_class, "locked", ruby_component_locked_set, 1);
-    rb_define_method(ruby_component_class, "contents", ruby_component_contents_each, 0);
+    rb_define_method(ruby_component_class, "contents", ruby_component_contents_get, 0);
     rb_define_method(ruby_component_class, "append!", ruby_component_append, -1);
     rb_define_method(ruby_component_class, "remove!", ruby_component_remove, -1);
-    //rb_define_method(ruby_component_class, "inheritable_attribs", ruby_component_inheritable_attribs_each, 0);
-    //rb_define_method(ruby_component_class, "promotable_attribs", ruby_component_inheritable_attribs_each, 0);
+    //rb_define_method(ruby_component_class, "inheritable_attribs", ruby_component_inheritable_attribs_get, 0);
+    //rb_define_method(ruby_component_class, "promotable_attribs", ruby_component_inheritable_attribs_get, 0);
     //rb_define_method(ruby_component_class, "promote_attribs!", ruby_component_promote_attribs, -1);
 }
 

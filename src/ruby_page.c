@@ -6,9 +6,9 @@ static VALUE ruby_page_alloc(VALUE class);
 static void ruby_page_mark(void *obj);
 static void ruby_page_free(void *obj);
 static VALUE ruby_page_pages_index(VALUE class, VALUE key);
-static VALUE ruby_page_pages_each(VALUE self);
+static VALUE ruby_page_pages_get(VALUE self);
 static VALUE ruby_page_initialize(int argc, VALUE argv[], VALUE self);
-static VALUE ruby_page_contents_each(VALUE self);
+static VALUE ruby_page_contents_get(VALUE self);
 static VALUE ruby_page_append(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_page_remove(int argc, VALUE argv[] , VALUE self);
 static VALUE ruby_page_get_filename(VALUE self);
@@ -91,32 +91,21 @@ static VALUE ruby_page_pages_index(VALUE class, VALUE key)
     return Qnil;
 }
 
-static VALUE ruby_page_pages_each(VALUE self)
+static VALUE ruby_page_pages_get(VALUE self)
 {
     TOPLEVEL *toplevel;
     VALUE pages;
 
     toplevel = ruby_get_c_toplevel();
 
-    if (rb_block_given_p()) {
-        GList *page_list = g_list_copy(geda_list_get_glist(toplevel->pages));
-        while (page_list != NULL) {
-            rb_yield(ruby_page_from_c(page_list->data));
-            page_list = g_list_next(page_list);
-        }
-        g_list_free(page_list);
-
-        return Qnil;
-    } else {
-        pages = rb_ary_new();
-        GList *page_list = geda_list_get_glist(toplevel->pages);
-        while (page_list != NULL) {
-            rb_ary_push(pages, ruby_page_from_c(page_list->data));
-            page_list = g_list_next(page_list);
-        }
-
-        return pages;
+    pages = rb_ary_new();
+    GList *page_list = geda_list_get_glist(toplevel->pages);
+    while (page_list != NULL) {
+        rb_ary_push(pages, ruby_page_from_c(page_list->data));
+        page_list = g_list_next(page_list);
     }
+
+    return pages;
 }
 
 
@@ -139,32 +128,21 @@ static VALUE ruby_page_initialize(int argc, VALUE argv[], VALUE self)
     return self;
 }
 
-static VALUE ruby_page_contents_each(VALUE self)
+static VALUE ruby_page_contents_get(VALUE self)
 {
     PAGE *page;
     VALUE objects;
 
     page = ruby_page_to_c(self);
 
-    if (rb_block_given_p()) {
-        GList *object_list = g_list_copy(s_page_objects(page));
-        while (object_list != NULL) {
-            rb_yield(ruby_object_from_c(object_list->data));
-            object_list = g_list_next(object_list);
-        }
-        g_list_free(object_list);
-
-        return Qnil;
-    } else {
-        objects = rb_ary_new();
-        GList *object_list = s_page_objects(page);
-        while (object_list != NULL) {
-            rb_ary_push(objects, ruby_object_from_c(object_list->data));
-            object_list = g_list_next(object_list);
-        }
-
-        return objects;
+    objects = rb_ary_new();
+    GList *object_list = s_page_objects(page);
+    while (object_list != NULL) {
+        rb_ary_push(objects, ruby_object_from_c(object_list->data));
+        object_list = g_list_next(object_list);
     }
+
+    return objects;
 }
 
 static VALUE ruby_page_append(int argc, VALUE argv[], VALUE self)
@@ -315,10 +293,10 @@ void ruby_page_init(void)
 {
     ruby_page_class = rb_define_class_under(ruby_geda_module, "Page", rb_cObject);
     rb_define_singleton_method(ruby_page_class, "[]", ruby_page_pages_index, 1);
-    rb_define_singleton_method(ruby_page_class, "pages", ruby_page_pages_each, 0);
+    rb_define_singleton_method(ruby_page_class, "pages", ruby_page_pages_get, 0);
     rb_define_alloc_func(ruby_page_class, ruby_page_alloc);
     rb_define_method(ruby_page_class, "initialize", ruby_page_initialize, -1);
-    rb_define_method(ruby_page_class, "contents", ruby_page_contents_each, 0);
+    rb_define_method(ruby_page_class, "contents", ruby_page_contents_get, 0);
     rb_define_method(ruby_page_class, "append!", ruby_page_append, -1);
     rb_define_method(ruby_page_class, "remove!", ruby_page_remove, -1);
     rb_define_method(ruby_page_class, "filename", ruby_page_get_filename, 0);
