@@ -56,7 +56,7 @@ static VALUE ruby_text_visible_set(VALUE self, VALUE visible);
 static VALUE ruby_text_attrib_mode_get(VALUE self);
 static VALUE ruby_text_attrib_mode_set(VALUE self, VALUE show);
 
-VALUE ruby_attrib_class;
+VALUE ruby_attrib_module;
 static VALUE ruby_attrib_name_get(VALUE self);
 static VALUE ruby_attrib_value_get(VALUE self);
 static VALUE ruby_attrib_value_set(VALUE self, VALUE value);
@@ -81,11 +81,12 @@ static VALUE ruby_component_append(int argc, VALUE argv[], VALUE self);
 static VALUE ruby_component_remove(int argc, VALUE argv[] , VALUE self);
 
 
-VALUE ruby_object_from_c(OBJECT *object)
+VALUE ruby_object_from_c(OBJECT *obj)
 {
     VALUE class;
+    VALUE object;
 
-    switch (object->type) {
+    switch (obj->type) {
     case OBJ_LINE:
         class = ruby_line_class;
         break;
@@ -114,11 +115,7 @@ VALUE ruby_object_from_c(OBJECT *object)
         class = ruby_picture_class;
         break;
     case OBJ_TEXT:
-        if (o_attrib_get_name_value(object, NULL, NULL)) {
-            class = ruby_attrib_class;
-        } else {
-            class = ruby_text_class;
-        }
+        class = ruby_text_class;
         break;
     case OBJ_PLACEHOLDER:
     case OBJ_COMPLEX:
@@ -126,12 +123,19 @@ VALUE ruby_object_from_c(OBJECT *object)
         break;
 
     default:
-fprintf(stderr, "%s: unknown object type %d\n", __func__, (int)object->type);
+fprintf(stderr, "%s: unknown object type %d\n", __func__, (int)obj->type);
         ///@todo
         break;
     }
 
-    return Data_Wrap_Struct(class, ruby_object_mark, ruby_object_free, object);
+    object = Data_Wrap_Struct(class, ruby_object_mark, ruby_object_free, obj);
+    if (class == ruby_text_class) {
+        ///@todo this shouldn't be here
+        if (o_attrib_get_name_value(obj, NULL, NULL)) {
+            rb_extend_object(object, ruby_attrib_module);
+        }
+    }
+    return object;
 }
 
 OBJECT *ruby_object_to_c(VALUE object)
@@ -312,6 +316,18 @@ static VALUE ruby_vector_y_set(VALUE self, VALUE y)
     return rb_iv_set(self, "@y", y);
 }
 
+static VALUE ruby_text_alloc(VALUE class)
+{
+    TOPLEVEL *toplevel;
+    OBJECT *object;
+
+    toplevel = ruby_get_c_toplevel();
+    object = o_text_new(toplevel, OBJ_TEXT, DEFAULT_COLOR, 0, 0, LOWER_LEFT, 0,
+                        "", 10, VISIBLE, SHOW_NAME_VALUE);
+
+    return ruby_object_from_c(object);
+}
+
 static VALUE ruby_text_initialize(int argc, VALUE argv[], VALUE self)
 {
     return ruby_text_set(argc, argv, self);
@@ -487,6 +503,10 @@ static VALUE ruby_text_string_set(VALUE self, VALUE string)
     }
 
     object->text->string = g_strdup(StringValueCStr(string));
+
+    if (o_attrib_get_name_value(object, NULL, NULL)) {
+        rb_extend_object(self, ruby_attrib_module);
+    }
 
     return self;
 }
@@ -887,6 +907,8 @@ void ruby_object_init(void)
     ruby_picture_class = rb_define_class_under(ruby_geda_module, "Picture", ruby_object_class);
 
     ruby_text_class = rb_define_class_under(ruby_geda_module, "Text", ruby_object_class);
+    rb_define_alloc_func(ruby_text_class, ruby_text_alloc);
+    rb_define_method(ruby_text_class, "initialize", ruby_text_initialize, -1);
     rb_define_method(ruby_text_class, "set", ruby_text_set, -1);
     rb_define_method(ruby_text_class, "anchor", ruby_text_anchor_get, 0);
     rb_define_method(ruby_text_class, "anchor=", ruby_text_anchor_set, -1);
@@ -902,15 +924,15 @@ void ruby_object_init(void)
     rb_define_method(ruby_text_class, "attrib_mode", ruby_text_attrib_mode_get, 0);
     rb_define_method(ruby_text_class, "attrib_mode=", ruby_text_attrib_mode_get, 1);
 
-    ruby_attrib_class = rb_define_class_under(ruby_geda_module, "Attrib", ruby_text_class);
-    rb_define_method(ruby_attrib_class, "name", ruby_attrib_name_get, 0);
-    rb_define_method(ruby_attrib_class, "value", ruby_attrib_value_get, 0);
-    rb_define_method(ruby_attrib_class, "value=", ruby_attrib_value_set, 1);
-    rb_define_method(ruby_attrib_class, "attachment", ruby_attrib_attachment_get, 0);
-    rb_define_method(ruby_attrib_class, "attachment=", ruby_attrib_attachment_set, 1);
-    rb_define_method(ruby_attrib_class, "attach!", ruby_attrib_attachment_set, 1);
-    rb_define_method(ruby_attrib_class, "detach!", ruby_attrib_detach, 0);
-    rb_define_method(ruby_attrib_class, "inherited?", ruby_attrib_inherited_get, 0);
+    ruby_attrib_module = rb_define_module_under(ruby_geda_module, "Attrib");
+    rb_define_method(ruby_attrib_module, "name", ruby_attrib_name_get, 0);
+    rb_define_method(ruby_attrib_module, "value", ruby_attrib_value_get, 0);
+    rb_define_method(ruby_attrib_module, "value=", ruby_attrib_value_set, 1);
+    rb_define_method(ruby_attrib_module, "attachment", ruby_attrib_attachment_get, 0);
+    rb_define_method(ruby_attrib_module, "attachment=", ruby_attrib_attachment_set, 1);
+    rb_define_method(ruby_attrib_module, "attach!", ruby_attrib_attachment_set, 1);
+    rb_define_method(ruby_attrib_module, "detach!", ruby_attrib_detach, 0);
+    rb_define_method(ruby_attrib_module, "inherited?", ruby_attrib_inherited_get, 0);
 
     ruby_component_class = rb_define_class_under(ruby_geda_module, "Component", ruby_object_class);
     //rb_define_method(ruby_component_class, "initialize", ruby_component_initialize, 5);
