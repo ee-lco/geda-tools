@@ -1,6 +1,6 @@
 require 'gEDA'
 
-Paths = ['../../../ps/lib/dev/']
+Paths = ['../../../ps/e361xa/pcb/lib/dev/']
 
 def devmap(component, attrib, devmap)
     Paths.each do |path|
@@ -18,7 +18,7 @@ def devmap(component, attrib, devmap)
                     when "delattr"
                         component.detach_attribs!
                     when "include"
-                        devmap(component, attrib, "#{arg}")
+                        devmap(component, attrib, arg)
                     end
                 end
             end
@@ -26,11 +26,11 @@ def devmap(component, attrib, devmap)
     end
 end
 
-page = GEDA::Page.new("schematic.sch")
+page = GEDA::Page.new("untitled_1.sch")
 page.read!($stdin.read)
 page.contents.select { |object| object.is_a? GEDA::Component}.each do |component|
     component.attribs.select { |attrib| attrib.name == "devmap" }.each do |attrib|
-        devmap(component, attrib, "#{attrib.value}")
+        devmap(component, attrib, attrib.value)
     end
 end
 $stdout.write(page.write)

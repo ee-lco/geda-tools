@@ -8,7 +8,7 @@ def pinmap(component, oldpin, newpin)
     end
 end
 
-page = GEDA::Page.new("schematic.sch")
+page = GEDA::Page.new("untitled_1.sch")
 page.read!($stdin.read)
 page.contents.select { |object| object.is_a? GEDA::Component}.each do |component|
     component.attribs.select { |attrib| attrib.name == "pinmap" }.each do |attrib|
