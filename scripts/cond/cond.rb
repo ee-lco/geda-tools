@@ -1,4 +1,20 @@
 require 'gEDA'
+require 'optparse'
+require 'cond.tab'
+
+$options = {}
+$options[:defines] = []
+
+OptionParser.new do |opts|
+    opts.banner = "Usage: cond.rb [options]"
+
+    opts.on("-D", "--define <variable>",
+            "Add <variables> to the list of conditional variables") do |var|
+        $options[:defines] << var
+    end
+end.parse!
+
+parser = CondParser.new($options[:defines])
 
 page = GEDA::Page.new("untitled_1.sch")
 page.read!($stdin.read)
@@ -7,7 +23,8 @@ page.contents.select { |object| object.is_a? GEDA::Component}.each do |object|
         if attrib.value =~ /^\[([^\]]*)\]\s*(.*)/
             pred = $1
             value = $2
-            if pred.split(/,\s*/).include? "14"
+            if parser.parse(pred)
+#            if pred.split(/,\s*/).include? "14"
                 target = object.attribs.find { |a| a.value == "*" }
                 if target
                     target.value = value
