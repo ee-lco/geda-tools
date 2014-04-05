@@ -1,0 +1,27 @@
+class ExprParser
+rule
+    attribute
+        :
+        | expression
+        ;
+
+    expression
+        : primary_expression
+        | expression primary_expression { return val.join }
+        ;
+
+    primary_expression
+        : PASS
+        | LVAR IDENTIFIER RVAR      { m = @component.attribs.select { |attrib| attrib.name == val[1] }; return m.length == 1 ? m[0].value : "##ERROR##" }
+        ;
+
+end
+
+---- header
+    require 'expr.lex'
+
+---- inner
+    def parse(component, text)
+        @component = component
+        scan_str(text)
+    end
