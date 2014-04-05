@@ -1,9 +1,20 @@
 require 'gEDA'
+require 'optparse'
 
-Paths = ['../../../ps/e361xa/pcb/lib/dev/']
+$options = {}
+$options[:paths] = []
+
+OptionParser.new do |opts|
+    opts.banner = "Usage: devmap.rb [options]"
+
+    opts.on("-P", "--path <directory>",
+            "Add <directory> to the devmap search path") do |dir|
+        $options[:paths] << dir
+    end
+end.parse!
 
 def devmap(component, attrib, devmap)
-    Paths.each do |path|
+    $options[:paths].each do |path|
         if File.exists?("#{path}#{devmap}")
             f = File.new("#{path}#{devmap}")
             f.each_line do |line|
