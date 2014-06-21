@@ -14,8 +14,10 @@ OptionParser.new do |opts|
 end.parse!
 
 def devmap(component, attrib, devmap)
+    found=false
     $options[:paths].each do |path|
         if File.exists?("#{path}#{devmap}")
+            found=true
             f = File.new("#{path}#{devmap}")
             f.each_line do |line|
                 if line =~ /([A-Za-z0-9_-]+)\s+(.*)/
@@ -34,6 +36,9 @@ def devmap(component, attrib, devmap)
                 end
             end
         end
+    end
+    if !found
+        $stderr.puts "WARNING: #{devmap} not found"
     end
 end
 
