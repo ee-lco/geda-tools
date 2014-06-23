@@ -2,8 +2,11 @@ require 'gEDA'
 
 def pinmap(component, oldpin, newpin)
     component.contents.select { |object| object.is_a? GEDA::Pin}.each do |pin|
-        pin.attribs.select { |attrib| attrib.name == "pinnumber" && attrib.value == oldpin }.each do |attrib|
-            attrib.value=newpin
+        if pin.attribs.find { |attrib| (attrib.name == "pinnumber" || attrib.name == "pinlabel") && attrib.value == oldpin }
+            attrib = pin.attribs.find { |attrib| attrib.name == "pinnumber" }
+            if attrib
+                attrib.value = newpin
+            end
         end
     end
 end
