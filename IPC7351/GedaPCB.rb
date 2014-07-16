@@ -1,12 +1,13 @@
+require_relative 'Renderer'
+
 module IPC7351
     class GedaPCB < Renderer
         def initialize
             super(".fp")
-            @f = "% .3fmm"
+            @f = "% .4gmm"
         end
 
-        #def render(footprint, io, layers = ["copper", "silkscreen"])
-        def render(footprint, io, layers = nil)
+        def render(footprint, io, layers = ["copper", "silkscreen"])
             super(footprint, io, layers)
         end
 
@@ -22,8 +23,8 @@ module IPC7351
             y1 = pad.c.y - (pad.w - lw) / 2.0
             x2 = pad.c.x + (pad.l - lw) / 2.0
             y2 = pad.c.y + (pad.w - lw) / 2.0
-            #@io.puts %Q{\tPad[#{@f} #{@f} #{@f} #{@f} #{@f} 0.250mm 1.500mm "" "%s" "square"]\n} % [x1, -y1, x2, -y2, lw, pad.name]
-            @io.puts %Q{\tPad[#{@f} #{@f} #{@f} #{@f} #{@f} 0.250mm 1.500mm "" "%s" "square"] # cx=% .2f cy=% .2f l=% .2f w=% .2f\n} % [x1, -y1, x2, -y2, lw, pad.name, pad.c.x, pad.c.y, pad.l, pad.w]
+            #@io.puts %Q{\t#{@f} #{@f} #{@f} #{@f}} % [pad.c.x, pad.c.y, pad.l, pad.w]
+            @io.puts %Q{\tPad[#{@f} #{@f} #{@f} #{@f} #{@f} 0.250mm #{@f} "" "%s" "square"]\n} % [x1, -y1, x2, -y2, lw, lw, pad.name] ## @todo use solder mask expansion from settings
         end
 
         def render_layer(layer)

@@ -1,3 +1,5 @@
+require_relative 'Renderer'
+
 module IPC7351
     class SVG < Renderer
         def initialize

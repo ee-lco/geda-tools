@@ -1,6 +1,3 @@
-#encoding: UTF-8
-require 'IPC7351'
-
 module IPC7351
     module DualPads
         def generate_pads
@@ -8,9 +5,12 @@ module IPC7351
                 "DIO"  => ["C", "A"],
             }[@type] || ["1", "2"]
 
-            pf   = PadFactory.new(@env, @tols, @spec["D"], @spec["E"], @spec["L"])
-            @pads.add(pf.pads(1, 1, 0, Geometry.side("left"),  [names[0]]))
-            @pads.add(pf.pads(2, 1, 0, Geometry.side("right"), [names[1]]))
+            pwl  = @spec.include?("b")  ? @spec["b"]  : @spec["E"]
+            pwr  = @spec.include?("b1") ? @spec["b1"] : pwl
+            pfl  = PadFactory.new(@settings, @env, @spec["D"], pwl, @spec["L"])
+            pfr  = PadFactory.new(@settings, @env, @spec["D"], pwr, @spec["L"], @spec["L1"])
+            @pads.add(pfl.pads(1, 1, 0, Geometry.side("left"),  [names[0]]))
+            @pads.add(pfr.pads(2, 1, 0, Geometry.side("right"), [names[1]]))
         end
     end
 
@@ -28,7 +28,7 @@ module IPC7351
             else
                 pins  = @pins
             end
-            pf   = PadFactory.new(@env, @tols, @spec["E"], @spec["b"], @spec["L"])
+            pf   = PadFactory.new(@settings, @env, @spec["E"], @spec["b"], @spec["L"])
             ppr  = pins / 2
             @pads.add(pf.pads(1,       ppr, @spec["e"].nom, Geometry.side("bottom"), names_bottom))
             @pads.add(pf.pads(ppr + 1, ppr, @spec["e"].nom, Geometry.side("top"),    names_top))
@@ -44,7 +44,7 @@ module IPC7351
             clr     = @env["silkscreen.clearance"] + lw / 2.0
             outline = @settings["silkscreen.body"]
 
-            min_line_length = lw * 4
+            min_line_length = lw * 3
 
             pads = pads_by_side
             dims = get_dims(@bl[outline], @bw[outline], 0, pads, clr, lw)
@@ -168,7 +168,7 @@ module IPC7351
         include DualRowNoLead
     end
 
-    module RectEndCaps
+    module RectEndCap
         def select_env
             if @spec["D"].max < 1.6
                 env = "Rectangular End Cap Length < 1.6 mm"
@@ -184,14 +184,16 @@ module IPC7351
         def select_env
             srms = PadFactory.get_srms(@spec["E"], @spec["b"], @spec["L"])
 
+            e = @spec.include?("e") ? @spec["e"]["nom"] : 1.0
+
             if srms["min"] > @bw["max"] || @spec["L"]["tol"] >= 0.5
-                if @spec["e"]["nom"] <= 0.625
+                if e <= 0.625
                     env = "Gull Wing Pitch <= 0.625 mm"
                 else
                     env = "Gull Wing Pitch > 0.625 mm"
                 end
             else
-                if @spec["e"]["nom"] <= 0.625
+                if e <= 0.625
                     env = "Outward L Lead Pitch <= 0.625 mm"
                 else
                     env = "Outward L Lead Pitch > 0.625 mm"
@@ -201,5 +203,17 @@ module IPC7351
             return Environment.new(@settings["environment"], env)
         end
      end
+
+    module FlatLead
+        def select_env
+            return Environment.new(@settings["environment"], "Flat Lead")
+        end
+    end
+
+    module InwardL
+        def select_env
+            return Environment.new(@settings["environment"], "Inward Flat Ribbon L", :inward)
+        end
+    end
 end
 
