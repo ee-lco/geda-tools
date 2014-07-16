@@ -77,10 +77,23 @@ $ac_mkmf_result])
     #
     AC_MSG_CHECKING([for Ruby include path])
     if test -z "$RUBY_CPPFLAGS"; then
-        ruby_path=`$RUBY -rmkmf -e 'print Config::CONFIG[["archdir"]]'`
-        if test -n "${ruby_path}"; then
-                ruby_path="-I$ruby_path"
+        ruby_arch=`$RUBY -rmkmf -e 'print Config::CONFIG[["arch"]]'`
+        ruby_rubyarchhdrdir=`$RUBY -rmkmf -e 'print Config::CONFIG[["rubyarchhdrdir"]]'`
+        ruby_sitehdrdir=`$RUBY -rmkmf -e 'print Config::CONFIG[["sitehdrdir"]]'`
+        ruby_vendorhdrdir=`$RUBY -rmkmf -e 'print Config::CONFIG[["vendorhdrdir"]]'`
+        ruby_rubyhdrdir=`$RUBY -rmkmf -e 'print Config::CONFIG[["rubyhdrdir"]]'`
+        ruby_archdir=`$RUBY -rmkmf -e 'print Config::CONFIG[["archdir"]]'`
+        if test -z "${ruby_rubyarchhdrdir}"; then
+            if test -n "${ruby_arch}" -a -n "${ruby_rubyhdrdir}"; then
+                ruby_rubyarchhdrdir="${ruby_rubyhdrdir}/${ruby_arch}"
+            else
+                ruby_rubyarchhdrdir="${ruby_archdir}"
+            fi
         fi
+        ruby_path="-I${ruby_rubyarchhdrdir}"
+        for hdrdir in ${ruby_sitehdrdir} ${ruby_vendorhdrdir} ${ruby_rubyhdrdir}; do
+            ruby_path="${ruby_path} -I${hdrdir}"
+        done
         RUBY_CPPFLAGS=$ruby_path
     fi
     AC_MSG_RESULT([$RUBY_CPPFLAGS])
