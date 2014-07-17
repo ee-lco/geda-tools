@@ -1,8 +1,12 @@
 require 'IPC7351'
 
 
-module FPG
-    def self.capc
+class FPG
+    def initialize(settings, env = nil)
+        @settings, @env = settings, env
+    end
+
+    def capc
         {
             "0201" => { "D" => "0.60 ~ 0.05", "E" => " 0.30 ~ 0.05", "A" => { "max" => 0.35 }, "L" => "0.15 ~ 0.05" },
             "0402" => { "D" => "1.00 ~ 0.10", "E" => " 0.50 ~ 0.10", "A" => { "max" => 0.60 }, "L" => "0.30 ~ 0.15" },
@@ -41,11 +45,11 @@ module FPG
             #"2220" => { "D" => "5.70 ~ 0.40",        "E" => " 5.00 ~ 0.40",        "A" => { "max" => 2.65 }, "L" => "0.60 ~ 0.35" },
             #"2225" => { "D" => "5.60 ~ 0.40",        "E" => " 6.40 ~ 0.40",        "A" => { "max" => 1.55 }, "L" => "0.60 ~ 0.35" },
         }.collect do |name, spec|
-            next IPC7351::Chip.new("CAP", name, nil, spec, Settings)
+            next IPC7351::Chip.new("CAP", name, nil, spec, @settings, @env)
         end
     end
 
-    def self.fusc
+    def fusc
         # TE Connectivity SMD series
         # Note: exact sizes vary, overall min/max is used
         {
@@ -55,11 +59,11 @@ module FPG
             "1210" => { "D" => "3.00 .. 3.43", "E" => "2.35 .. 2.80", "A" => "0.28 .. 1.22", "L" => "0.25 .. 0.75" },
             "1812" => { "D" => "4.37 .. 4.83", "E" => "3.07 .. 3.41", "A" => "0.28 .. 1.94", "L" => "0.25 .. 0.95" },
         }.collect do |name, spec|
-            next IPC7351::Chip.new("FUS", name, nil, spec, Settings)
+            next IPC7351::Chip.new("FUS", name, nil, spec, @settings, @env)
         end
     end
 
-    def self.resc
+    def resc
         {
             "01005" => { "D" => "0.40 ~ 0.03", "E" => "0.20 ~ 0.03", "A" => { "max" => "0.15" }, "L" => "0.10 ~ 0.03" },
             "0201"  => { "D" => "0.60 ~ 0.05", "E" => "0.30 ~ 0.05", "A" => { "max" => "0.30" }, "L" => "0.15 ~ 0.05" },
@@ -92,16 +96,16 @@ module FPG
             #"2010"  => { "D" => "5.00 ~ 0.20",        "E" => "2.50 ~ 0.20",        "A" => "0.60 ~ 0.10", "L" => "0.60 ~ 0.20" },
             #"2512"  => { "D" => "6.40 ~ 0.20",        "E" => "3.20 ~ 0.20",        "A" => "0.60 ~ 0.10", "L" => "0.60 ~ 0.20" },
         }.collect do |name, spec|
-            next IPC7351::Chip.new("RES", name, nil, spec, Settings)
+            next IPC7351::Chip.new("RES", name, nil, spec, @settings, @env)
         end
     end
 
-    def self.sod
+    def sod
         {
             "SOD123"   => { "D" => "3.50 .. 3.90", "D1" => "2.50 .. 2.90", "E" => "1.40 .. 1.80", "A" => { "max" => "0.94" }, "A1" => "0.00 .. 0.10", "b" => "0.50 .. 0.75", "L" => "0.25 .. 0.40" },
             "SOD323"   => { "D" => "2.30 .. 2.70", "D1" => "1.60 .. 1.80", "E" => "1.15 .. 1.35", "A" => { "max" => "0.80" }, "A1" => "0.00 .. 0.10", "b" => "0.25 .. 0.40", "L" => "0.20 .. 0.40" },
         }.collect do |name, spec|
-            next IPC7351::SOD.new(name, spec, Settings)
+            next IPC7351::SOD.new(name, spec, @settings, @env)
         end
         {
             "SOD123FL" => { "D" => "3.40 .. 3.60", "D1" => "2.50 .. 2.70", "E" => "1.50 .. 1.70", "A" => { "max" => "0.90" },                         "b" => "0.55 .. 1.10", "L" => "0.35 .. 0.95" },
@@ -110,7 +114,7 @@ module FPG
             "SOD723FL" => { "D" => "1.35 .. 1.45", "D1" => "0.95 .. 1.05", "E" => "0.55 .. 0.65", "A" => { "max" => "0.49" },                         "b" => "0.25 .. 0.32", "L" => "0.15 .. 0.25" },
             "SOD923FL" => { "D" => "0.95 .. 1.05", "D1" => "0.75 .. 0.85", "E" => "0.55 .. 0.65", "A" => { "max" => "0.34" },                         "b" => "0.15 .. 0.25", "L" => "0.15 .. 0.25" },
         }.collect do |name, spec|
-            next IPC7351::SODFL.new(name, spec, Settings)
+            next IPC7351::SODFL.new(name, spec, @settings, @env)
         end
         # Diodes Inc. SODx23
             #"SOD123"   => { "D" => "3.55 .. 3.85", "D1" => "2.55 .. 2.85", "E" => "1.40 .. 1.70", "A" => "1.00 .. 1.35", "A1" => "0.00 .. 0.10", "b" => { "nom" => "0.55" }, "L" => "0.25 .. 0.40" },
@@ -132,7 +136,7 @@ module FPG
             #"SOD923FL" => { "D" => "0.95 .. 1.05", "D1" => "0.75 .. 0.85", "E" => "0.55 .. 0.65", "A" => "0.34 .. 0.43", "b"  => "0.15 .. 0.25", "L" => { "nom" => "0.19" } },
     end
 
-    def self.diom
+    def diom
         {
             "SMA" => { "D" => "4.80 .. 5.60", "E" => "2.29 .. 2.92", "A" => "1.97 .. 2.30", "b" => "1.25 .. 1.65", "L" => "0.76 .. 1.52" },
             "SMB" => { "D" => "5.00 .. 5.60", "E" => "3.30 .. 3.95", "A" => "2.00 .. 2.50", "b" => "1.95 .. 2.21", "L" => "0.76 .. 1.52" },
@@ -151,11 +155,11 @@ module FPG
             #"SMB"    => { "D" => "5.21 .. 5.60", "E" => "3.30 .. 3.95", "A" => "1.95 .. 2.47", "b" => "1.96 .. 2.20", "L" => "0.76 .. 1.60" },
             #"SMC"    => { "D" => "7.75 .. 8.13", "E" => "5.59 .. 6.10", "A" => "1.90 .. 2.41", "b" => "2.92 .. 3.07", "L" => "0.76 .. 1.27" },
         }.collect do |name, spec|
-            next IPC7351::MoldedBody.new("DIO", name, nil, spec, Settings)
+            next IPC7351::MoldedBody.new("DIO", name, nil, spec, @settings, @env)
         end
     end
 
-    def self.sot
+    def sot
         # Texas Instruments DBV package
         # Note: D of SOT23-3 is 2.80 .. 3.00
         [3, 5, 6].collect do |pins|
@@ -169,11 +173,11 @@ module FPG
                 "e"    => { "nom" => "0.95" },
                 "L"    => "0.30 .. 0.55",
             }
-            next IPC7351::SO.new("SOT", "SOT23", pins, spec, Settings)
+            next IPC7351::SO.new("SOT", "SOT23", pins, spec, @settings, @env)
         end
     end
 
-    def self.soic
+    def soic
         # Texas Instruments D package
         [8, 10, 12, 14, 16].collect do |pins|
             d = pins / 2 * 1.25 - 0.1
@@ -187,11 +191,11 @@ module FPG
                 "e"    => { "nom" => "1.27" },
                 "L"    => "0.40 .. 1.27",
             }
-            next IPC7351::SO.new("SOIC", "SOIC", pins, spec, Settings)
+            next IPC7351::SO.new("SOIC", "SOIC", pins, spec, @settings, @env)
         end
     end
 
-    def self.soicw
+    def soicw
         # Texas Instruments DW package
         [16, 18, 20, 24, 28].collect do |pins|
             d  = pins / 2 * 1.25 + 0.3
@@ -206,22 +210,22 @@ module FPG
                 "e"    => { "nom" => "1.27" },
                 "L"    => "0.40 ..  1.27",
             }
-            next IPC7351::SO.new("SOIC", "SOICW", pins, spec, Settings)
+            next IPC7351::SO.new("SOIC", "SOICW", pins, spec, @settings, @env)
         end
     end
 
-    def self.te_sm_x
+    def te_sm_x
         # TE Connectivity SM_2, _3, _5
         {
             "SM_2" => { "D" => { "max" =>  "7.9"}, "D1" =>  "6.7 ~ 0.3", "E" => "4.0 ~ 0.3", "A" => "3.55 ~ 0.3", "b" => "1.4 ~ 0.3", "L" => "1.5 ~ 0.3"},
             "SM_3" => { "D" => { "max" => "12.0"}, "D1" => "10.5 ~ 0.3", "E" => "5.5 ~ 0.3", "A" => "5.0  ~ 0.3", "b" => "1.7 ~ 0.3", "L" => "2.3 ~ 0.3"},
             "SM_5" => { "D" => { "max" => "17.0"}, "D1" => "13.5 ~ 0.3", "E" => "7.3 ~ 0.3", "A" => "6.8  ~ 0.3", "b" => "1.7 ~ 0.3", "L" => "2.5 ~ 0.3"},
         }.collect do |name, spec|
-            next IPC7351::MoldedBody.new("RES", name, nil, spec, Settings)
+            next IPC7351::MoldedBody.new("RES", name, nil, spec, @settings, @env)
         end
     end
 
-    def self.ts_dbls
+    def ts_dbls
         # Taiwan Semiconductor DBLS package
         {
             "DBLS" => {
@@ -232,57 +236,64 @@ module FPG
                                     "b" => "1.02 .. 1.20", "e" => "5.00 ..  5.20", "L"  => "1.02 .. 1.53"}
             }
         }.collect do |name, spec|
-            next IPC7351::SO.new("SOP", name, spec["pins"], spec["spec"], Settings)
+            next IPC7351::SO.new("SOP", name, spec["pins"], spec["spec"], @settings, @env)
         end
     end
-
-    Settings = IPC7351::Settings.new({
-        "environment"               => "N",
-    
-        "tolerance.fabrication"     => 0.10,
-        "tolerance.placement"       => 0.05,
-    
-        "pads.rounding.size"        => 0.05,
-        "pads.rounding.placement"   => 0.05,
-        "pads.clearance.pad"        => 0.15,
-        "pads.clearance.tab"        => 0.20,
-    
-        "copper.color"              => "#ff4040",
-    
-        "soldermask.color"          => "#c0ff40",
-        "soldermask.expansion"      => 0.00,
-    
-        "stencil.color"             => "#2020ff",
-        "stencil.expansion"         => 0.00,
-    
-        "silkscreen.color"          => "#ffffff",
-        "silkscreen.rounding"       => 0.01,
-        "silkscreen.body"           => "max",
-    
-        "assembly.width"            => 0.12,
-        "assembly.color"            => "#00ffff",
-        "assembly.rounding"         => 0.01,
-        "assembly.body"             => "max",
-    
-        "courtyard.width"           => 0.05,
-        "courtyard.color"           => "#808080",
-        "courtyard.marker"          => "yes",
-    })
 end
+
+default_settings = IPC7351::Settings.new({
+    "environment"               => "N",
+
+    "tolerance.fabrication"     => 0.10,
+    "tolerance.placement"       => 0.05,
+
+    "pads.rounding.size"        => 0.05,
+    "pads.rounding.placement"   => 0.05,
+    "pads.clearance.pad"        => 0.15,
+    "pads.clearance.tab"        => 0.20,
+
+    "copper.color"              => "#ff4040",
+
+    "soldermask.color"          => "#c0ff40",
+    "soldermask.expansion"      => 0.00,
+
+    "stencil.color"             => "#2020ff",
+    "stencil.expansion"         => 0.00,
+
+    "silkscreen.color"          => "#ffffff",
+    "silkscreen.rounding"       => 0.01,
+    "silkscreen.body"           => "max",
+
+    "assembly.width"            => 0.12,
+    "assembly.color"            => "#00ffff",
+    "assembly.rounding"         => 0.01,
+    "assembly.body"             => "max",
+
+    "courtyard.width"           => 0.05,
+    "courtyard.color"           => "#808080",
+    "courtyard.marker"          => "yes",
+})
+
+
 renderers = [ IPC7351::GedaPCB.new, renderer = IPC7351::SVG.new ]
 
-renderers.each do |renderer|
-    renderer.save(*[
-        FPG.capc,
-        FPG.fusc,
-        FPG.resc,
-        FPG.sod,
-        FPG.diom,
-        FPG.sot,
-        FPG.soic,
-        FPG.soicw,
-        FPG.te_sm_x,
-        FPG.ts_dbls,
-    ].flatten)
+["L", "N", "M", "HS"].each do |env|
+    settings = default_settings.strong_merge({ "environment" => env })
+    fpg = FPG.new(settings)
+
+    renderers.each do |renderer|
+        renderer.save(*[
+            fpg.capc,
+            fpg.fusc,
+            fpg.resc,
+            fpg.sod,
+            fpg.diom,
+            fpg.sot,
+            fpg.soic,
+            fpg.soicw,
+            fpg.te_sm_x,
+            fpg.ts_dbls,
+        ].flatten)
+    end
 end
 

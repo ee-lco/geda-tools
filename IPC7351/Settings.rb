@@ -23,6 +23,18 @@ module IPC7351
                         Hash[*@settings.select { |key, value| key.start_with?(name) }.
                             map { |key, value| [key.sub(name, ""), value] }.flatten])
         end
+
+        def merge(other)
+            return strong_merge(other)
+        end
+
+        def strong_merge(other)
+            return Settings.new(@settings.merge(other))
+        end
+
+        def weak_merge(other)
+            return Settings.new(other.merge(@settings))
+        end
     end
 end
 
