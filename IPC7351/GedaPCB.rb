@@ -19,9 +19,9 @@ module IPC7351
 
         def render_circle(circle)
             if circle.fill
-                @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [circle.c.x, circle.c.y, circle.c.x, circle.c.y, circle.r * 2]
+                @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [circle.c.x, -circle.c.y, circle.c.x, -circle.c.y, circle.r * 2]
             else
-                @io.puts %Q{\tElementArc[#{@f} #{@f} #{@f} #{@f} %d %d #{@f}]\n} % [circle.c.x, circle.c.y, circle.r, circle.r, 0, 360, circle.lw]
+                @io.puts %Q{\tElementArc[#{@f} #{@f} #{@f} #{@f} %d %d #{@f}]\n} % [circle.c.x, -circle.c.y, circle.r, circle.r, 0, 360, circle.lw]
             end
         end
 
