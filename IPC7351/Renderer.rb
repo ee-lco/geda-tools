@@ -15,8 +15,10 @@ module IPC7351
  
         def render_element(elt)
             case elt
-            when Drawable
-                render_drawable(elt)
+            when Polygon
+                render_polygon(elt)
+            when Circle 
+                render_circle(elt)
             when Pad
                 render_pad(elt)
             else

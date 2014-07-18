@@ -149,6 +149,11 @@ module IPC7351
                     when Point
                         x.push(arg.x)
                         y.push(arg.y)
+                    when Path
+                        arg.each do |point|
+                            x.push(point.x)
+                            y.push(point.y)
+                        end
                     when Bounds
                         x.push(arg.min.x, arg.max.x)
                         y.push(arg.min.y, arg.max.y)

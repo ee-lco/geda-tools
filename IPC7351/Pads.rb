@@ -22,8 +22,8 @@ module IPC7351
     end
 
     class PadFactory
-        def initialize(settings, env, l, w, t, t1 = nil)
-            xyc = PadFactory.get_xyc(settings, env, l, w, t, t1)
+        def initialize(settings, l, w, t, t1 = nil)
+            xyc = PadFactory.get_xyc(settings, l, w, t, t1)
 
             @l = xyc["x"]
             @w = xyc["y"]
@@ -41,10 +41,10 @@ module IPC7351
             return srms
         end
 
-        def self.get_minmax(settings, env, l, w, t)
+        def self.get_minmax(settings, l, w, t)
             srms = PadFactory.get_srms(l, w, t)
 
-            fillets  = env.select("fillet")
+            fillets  = settings.select("fillet")
             tols     = settings.select("tolerance")
 
             zmax = l.min    + 2 * fillets["toe"]  + PadFactory.rms(l.tol,    *tols.values)
@@ -54,8 +54,8 @@ module IPC7351
             return { "zmax" => zmax, "gmin" => gmin, "xmax" => xmax }
         end
 
-        def self.get_xyc(settings, env, l, w, t, t1 = nil)
-            minmax = PadFactory.get_minmax(settings, env, l, w, t)
+        def self.get_xyc(settings, l, w, t, t1 = nil)
+            minmax = PadFactory.get_minmax(settings, l, w, t)
 
             zmax = minmax["zmax"]
             gmin = minmax["gmin"]
@@ -78,7 +78,7 @@ module IPC7351
         end
 
         def pads(first, count, pitch, pos, names = nil)
-            pads = Pads.new
+            pads = PadGroup.new
 
             names = *(first...first+count).map { |name| name.to_s } if names.nil?
 
@@ -98,11 +98,11 @@ module IPC7351
         end
 
         def pad(num, name, pos)
-            return Pads.new.add(Pad.new(num, name, pos, @c, @l, @w))
+            return PadGroup.new.add(Pad.new(num, name, pos, @c, @l, @w))
         end
     end
 
-    class Pads
+    class PadGroup
         include Enumerable
         extend Forwardable
         def_delegators :@pads, :[], :empty?, :include?, :length, :member?, :size
@@ -119,7 +119,7 @@ module IPC7351
             case pads
             when Pad
                 pads = [pads]
-            when Pads
+            when PadGroup
                 pads = pads.entries
             when Array
             else
@@ -135,11 +135,11 @@ module IPC7351
         end
 
         def at_pos(pos)
-            return Pads.new.add(@pads.values.select { |pad| pad.pos == pos })
+            return PadGroup.new.add(@pads.values.select { |pad| pad.pos == pos })
         end
 
         def expand(dx, dy = dx)
-            return Pads.new.add(@pads.values.map { |pad| pad.expand(dx, dy) })
+            return PadGroup.new.add(@pads.values.map { |pad| pad.expand(dx, dy) })
         end
 
         def bounds
@@ -147,7 +147,7 @@ module IPC7351
         end
 
         def round(placement, size)
-            return Pads.new.add(@pads.values.map { |pad| pad.round(placement, size) })
+            return PadGroup.new.add(@pads.values.map { |pad| pad.round(placement, size) })
         end
     end
 end

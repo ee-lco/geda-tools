@@ -50,14 +50,30 @@ module IPC7351
         end
     end
 
-    class Path < Array
+    class Path
+        include Enumerable
+        extend Forwardable
         include Transformable
+        def_delegators :@points, :[], :empty?, :include?, :length, :member?, :size
 
-        def initialize(points, termination)
-            push *points
-            if termination == :closed
-                push first
+        def initialize(*args)
+            case args.length
+            when 1
+                path = *args
+                @points = path.map { |point| point }
+            when 2
+                points, termination = *args
+                @points = points.map { |point| point.clone }
+                if termination == :closed
+                    @points.push @points.first
+                end
+            else
+                raise ArgumentError
             end
+        end
+
+        def each
+            @points.each { |point| yield point }
         end
 
         def self.line(*args)
@@ -92,17 +108,13 @@ module IPC7351
                 c, l, w = *args
                 p1 = Point.new(c.x - l / 2.0, c.y - w / 2.0)
                 p2 = Point.new(c.x + l / 2.0, c.y + w / 2.0)
-            when 4
-                raise ArgumentError
-                p1, p2, p3, p4 = *args
-                p2 = p3
             else
                 raise ArgumentError
             end
 
             return Path.new([Point.new(p1.x, p1.y), Point.new(p2.x, p1.y),
-                                 Point.new(p2.x, p2.y), Point.new(p1.x, p2.y)],
-                                :closed)
+                             Point.new(p2.x, p2.y), Point.new(p1.x, p2.y)],
+                             :closed)
         end
 
         def self.polygon(points)
@@ -110,15 +122,15 @@ module IPC7351
         end
 
         def transform(matrix)
-            return Path.new(map { |point| point.transform(matrix) }, :open)
+            return Path.new(@points.map { |point| point.transform(matrix) }, :open)
         end
 
         def bounds
-            return Geometry::Bounds.new(*self)
+            return Geometry::Bounds.new(@points)
         end
 
         def round(placement)
-            return Path.new(map { |point| point.round(placement) }, :open)
+            return Path.new(@points.map { |point| point.round(placement) }, :open)
         end
     end
 end

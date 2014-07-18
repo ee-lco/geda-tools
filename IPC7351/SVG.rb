@@ -10,9 +10,17 @@ module IPC7351
             super(footprint, io, layers)
         end
 
-        def render_drawable(object)
+        def render_polygon(poly)
             @io.puts %Q{\t\t<path d="M %s" style="fill:none;stroke-width:%.3f;stroke-linecap:round"/>} %
-                [object.map { |p| "%.3f,%.3f" % [p.x, -p.y] }.join(" "), object.lw]
+                [poly.map { |p| "%.3f,%.3f" % [p.x, -p.y] }.join(" "), poly.lw]
+        end
+
+        def render_circle(circle)
+            if circle.fill
+                @io.puts %Q{\t\t<circle cx="%.3f" cy="%.3f" r="%.3f" style="stroke:none"/>} % [circle.c.x, circle.c.y, circle.r]
+            else
+                @io.puts %Q{\t\t<circle cx="%.3f" cy="%.3f" r="%.3f" style="fill:none;stroke-width:%.3f;s"/>} % [circle.c.x, circle.c.y, circle.r, circle.lw]
+            end
         end
 
         def render_pad(pad)

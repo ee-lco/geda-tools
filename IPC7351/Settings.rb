@@ -11,6 +11,10 @@ module IPC7351
             @settings = settings
         end
 
+        def to_h
+            return @settings.clone
+        end
+
         def to_s
             s = String.new
             @settings.keys.sort.each { |key| s += "%s=%s\n" % [key, @settings[key]] }
@@ -29,6 +33,11 @@ module IPC7351
         end
 
         def strong_merge(other)
+            case other
+            when Settings
+                other = other.to_h
+            end
+
             return Settings.new(@settings.merge(other))
         end
 

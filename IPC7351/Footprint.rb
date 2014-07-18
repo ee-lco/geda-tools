@@ -14,9 +14,9 @@ module IPC7351
             @bw = @spec.include?("E1") ? @spec["E1"] : @spec["E"]
 
             @settings = settings
-            @env      = env || select_env
+            @settings = @settings.merge(env || select_env)
 
-            @pads   = Pads.new
+            @pads   = PadGroup.new
             @layers = Array.new
 
             generate_text
@@ -63,8 +63,8 @@ module IPC7351
 
         def courtyard
             lw       = @settings["courtyard.width"]
-            clr      = @env["courtyard.excess"]
-            rounding = @env["courtyard.rounding"]
+            clr      = @settings["courtyard.excess"]
+            rounding = @settings["courtyard.rounding"]
 
             body = Path.rectangle(@bl["max"], @bw["max"])
 
@@ -105,35 +105,6 @@ module IPC7351
             add_layer("assembly", [Drawable.polygon(points, lw)])
 
             return self
-        end
-
-        def pads_by_side
-            pads = {}
-            Geometry.sides.each do |side|
-                pads[side] = @pads.at_pos(side)
-            end
-
-            return pads
-        end
-
-        def get_dims(bl, bw, bclr, pads, pclr, lw)
-            dims = {}
-            Geometry.sides.each do |side|
-                body = Geometry::Bounds.new(Path.rectangle(bl, bw)).
-                                        expand(bclr).
-                                        rotate_from(side)
-
-                dims[side] = {}
-
-                dims[side]["y1"] = pads[side].bounds.rotate_from(side).max.y if !pads[side].empty?
-                y2 = [-body.max.y]
-                y2.push(pads[side.prev].bounds.expand(pclr).rotate_from(side).min.y) if !pads[side.prev].empty?
-                y2.push(pads[side.next].bounds.expand(pclr).rotate_from(side).min.y) if !pads[side.next].empty?
-                dims[side]["y2"] = y2.min
-                dims[side]["y3"] = pads[side].bounds.rotate_from(side).min.y + lw / 2.0 if !pads[side].empty?
-            end
-
-            return dims
         end
 
         def f_x10(f)

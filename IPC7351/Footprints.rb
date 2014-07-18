@@ -2,9 +2,9 @@ require_relative 'BaseFootprints'
 
 module IPC7351
     class SO < Footprint
-        include Leaded
-        include DualRowPads
-        include GullWing
+        include Silkscreen::Leaded
+        include Pads::DualRow
+        include Leads::GullWing
 
         def initialize(type, can_name, pins, spec, settings, env = nil)
             @type, @can_name, @pins = type, can_name, pins
@@ -21,9 +21,9 @@ module IPC7351
     end
 
     class SOFL < Footprint
-        include Leaded
-        include DualRowPads
-        include FlatLead
+        include Silkscreen::Leaded
+        include Pads::DualRow
+        include Leads::FlatLead
 
         def initialize(type, can_name, pins, spec, settings, env = nil)
             @type, @can_name, @pins = type, can_name, pins
@@ -40,9 +40,9 @@ module IPC7351
     end
 
     class SOD < Footprint
-        include Leaded
-        include DualPads
-        include GullWing
+        include Silkscreen::Leaded
+        include Pads::Dual
+        include Leads::GullWing
 
         def initialize(can_name, spec, settings, env = nil)
             @can_name = can_name
@@ -58,9 +58,9 @@ module IPC7351
     end
 
     class SODFL < Footprint
-        include Leaded
-        include DualPads
-        include GullWing
+        include Silkscreen::Leaded
+        include Pads::Dual
+        include Leads::GullWing
 
         def initialize(can_name, spec, settings, env = nil)
             @can_name = can_name
@@ -76,9 +76,9 @@ module IPC7351
     end
 
     class Chip < Footprint
-        include DualNoLead
-        include DualPads
-        include RectEndCap
+        include Silkscreen::DualNoLead
+        include Pads::Dual
+        include Leads::RectEndCap
 
         def initialize(type, can_name, suffix, spec, settings, env = nil)
             @type, @can_name, @suffix = type, can_name, suffix
@@ -101,9 +101,9 @@ module IPC7351
     end
 
     class MoldedBody < Footprint
-        include Leaded
-        include DualPads
-        include InwardL
+        include Silkscreen::Leaded
+        include Pads::Dual
+        include Leads::InwardL
 
         def initialize(type, can_name, suffix, spec, settings, env = nil)
             @type, @can_name, @suffix = type, can_name, suffix
