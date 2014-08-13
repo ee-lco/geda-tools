@@ -21,10 +21,10 @@ module IPC7351
 
     Environments = {
         "Silkscreen" => {
-            "L"   => { "silkscreen.width" => 0.10, "silkscreen.clearance" => 0.10, "silkscreen.dot" => 0.30 },
-            "N"   => { "silkscreen.width" => 0.12, "silkscreen.clearance" => 0.12, "silkscreen.dot" => 0.40 },
-            "M"   => { "silkscreen.width" => 0.15, "silkscreen.clearance" => 0.15, "silkscreen.dot" => 0.50 },
-            "HS"  => { "silkscreen.width" => 0.20, "silkscreen.clearance" => 0.20, "silkscreen.dot" => 0.40 },
+            "L"   => { "silkscreen.width" => 0.10,  "silkscreen.clearance" => 0.10, "silkscreen.dot" => 0.30 },
+            "N"   => { "silkscreen.width" => 0.12,  "silkscreen.clearance" => 0.12, "silkscreen.dot" => 0.40 },
+            "M"   => { "silkscreen.width" => 0.15,  "silkscreen.clearance" => 0.15, "silkscreen.dot" => 0.50 },
+            "HS"  => { "silkscreen.width" => 0.205, "silkscreen.clearance" => 0.20, "silkscreen.dot" => 0.40 },
         },
 
         "Rectangular End Cap Length < 1.6 mm" => {
