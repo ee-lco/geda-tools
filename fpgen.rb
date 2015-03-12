@@ -215,6 +215,57 @@ class FPG
         end
     end
 
+    def tssop
+        # Texas Instruments PW package
+        d = {
+             8 => 3.00,
+            14 => 5.00,
+            16 => 5.00,
+            20 => 6.50,
+            24 => 7.80,
+            28 => 9.70,
+        }
+        d.keys.collect do |pins|
+            spec = {
+                "D"    => { "nom" => d[pins], "tol" => 0.20 },
+                "E"    => "6.30 .. 6.50",
+                "E1"   => "4.30 .. 4.50",
+                "A"    => { "max" => "1.20" },
+                "A1"   => "0.05 ..  0.15",
+                "b"    => "0.19 ..  0.30",
+                "e"    => { "nom" => "0.65" },
+                "L"    => "0.50 ..  0.75",
+            }
+            next IPC7351::SO.new("TSSOP", "TSSOP", pins, spec, @settings, @env)
+        end
+    end
+
+    def qfp
+        # ST QFP package
+        d = {
+             48 =>  9.00,
+             64 => 12.00,
+            100 => 16.00,
+            144 => 22.00,
+            176 => 26.00,
+            208 => 30.00,
+        }
+        d.keys.collect do |pins|
+            spec = {
+                "D"    => { "nom" => d[pins],        "tol" => 0.20 },
+                "D1"   => { "nom" => d[pins] - 2.00, "tol" => 0.20 },
+                "E"    => { "nom" => d[pins],        "tol" => 0.20 },
+                "E1"   => { "nom" => d[pins] - 2.00, "tol" => 0.20 },
+                "A"    => { "max" => "1.60" },
+                "A1"   => "0.05 ..  0.15",
+                "b"    => "0.17 ..  0.27",
+                "e"    => { "nom" => "0.50" },
+                "L"    => "0.45 ..  0.75",
+            }
+            next IPC7351::QFP.new("QFP", "QFP", pins, spec, @settings, @env)
+        end
+    end
+
     def te_sm_x
         # TE Connectivity SM_2, _3, _5
         {
@@ -292,6 +343,8 @@ renderers = [ IPC7351::GedaPCB.new, renderer = IPC7351::SVG.new ]
             fpg.sot,
             fpg.soic,
             fpg.soicw,
+            fpg.tssop,
+            fpg.qfp,
             fpg.te_sm_x,
             fpg.ts_dbls,
         ].flatten)
