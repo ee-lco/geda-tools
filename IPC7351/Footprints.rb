@@ -1,6 +1,25 @@
 require_relative 'BaseFootprints'
 
 module IPC7351
+    class QFP < Footprint
+        include Silkscreen::Leaded
+        include Pads::QuadRow
+        include Leads::GullWing
+
+        def initialize(type, can_name, pins, spec, settings, env = nil)
+            @type, @can_name, @pins = type, can_name, pins
+            @mark = true
+            super(spec, settings, env)
+        end
+
+        def generate_text
+            @ipc_name = "%s%dP%dX%dX%d-%dL%d%s" % [@type, f_x100(@spec["e"].nom), f_x100(@spec["D"].nom), f_x100(@spec["E"].nom), f_x100(@spec["A"].max), @pins, f_x100(@spec["L"].max - @spec["L"].min), @settings["environment"]]
+            @can_name = "%s-%d" % [@can_name, @pins]
+            @refdes   = "U"
+            super()
+        end
+    end
+
     class SO < Footprint
         include Silkscreen::Leaded
         include Pads::DualRow

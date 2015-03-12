@@ -37,6 +37,15 @@ module IPC7351
         end
 
         module QuadRow
+            def generate_pads
+                ppr  = @pins / 4
+                pf_v = PadFactory.new(@settings, @spec["D"], @spec["b"], @spec["L"])
+                pf_h = PadFactory.new(@settings, @spec["E"], @spec["b"], @spec["L"])
+                @pads.add(pf_h.pads(1,           ppr, @spec["e"].nom, Geometry.side("bottom")))
+                @pads.add(pf_v.pads(ppr     + 1, ppr, @spec["e"].nom, Geometry.side("right")))
+                @pads.add(pf_h.pads(ppr * 2 + 1, ppr, @spec["e"].nom, Geometry.side("top")))
+                @pads.add(pf_v.pads(ppr * 3 + 1, ppr, @spec["e"].nom, Geometry.side("left")))
+            end
         end
     end
 
