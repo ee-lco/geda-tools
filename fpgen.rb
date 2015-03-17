@@ -108,6 +108,9 @@ class FPG
         }.collect do |name, spec|
             next IPC7351::SOD.new(name, spec, @settings, @env)
         end
+    end
+
+    def sodfl
         {
             "SOD123FL" => { "D" => "3.40 .. 3.60", "D1" => "2.50 .. 2.70", "E" => "1.50 .. 1.70", "A" => { "max" => "0.90" },                         "b" => "0.55 .. 1.10", "L" => "0.35 .. 0.95" },
             "SOD323FL" => { "D" => "2.30 .. 2.70", "D1" => "1.60 .. 1.80", "E" => "1.15 .. 1.35", "A" => { "max" => "0.65" },                         "b" => "0.30 .. 0.50", "L" => "0.30 .. 0.50" },
@@ -180,7 +183,14 @@ class FPG
 
     def soic
         # Texas Instruments D package
-        [8, 10, 12, 14, 16].collect do |pins|
+        d = {
+             8 => 4.90,
+            10 => 6.15,
+            12 => 7.40,
+            14 => 8.65,
+            16 => 9.90,
+        }
+        d.keys.collect do |pins|
             d = pins / 2 * 1.25 - 0.1
             spec = {
                 "D"    => { "nom" => d, "tol" => 0.20 },
@@ -198,7 +208,14 @@ class FPG
 
     def soicw
         # Texas Instruments DW package
-        [16, 18, 20, 24, 28].collect do |pins|
+        d = {
+            16 => 10.30,
+            18 => 11.55,
+            20 => 12.80,
+            24 => 15.40,
+            28 => 17.90,
+        }
+        d.keys.collect do |pins|
             d  = pins / 2 * 1.25 + 0.3
             d += 0.1 if (pins > 20)
             spec = {
@@ -263,6 +280,15 @@ class FPG
                 "L"    => "0.45 ..  0.75",
             }
             next IPC7351::QFP.new("QFP", "QFP", pins, spec, @settings, @env)
+        end
+    end
+
+    def crystal
+        # TXC HC-49S
+        {
+            "HC49-US" => { "D" => "12.7 ~ 0.5", "D1" => "11.4 ~ 0.5", "E" => "4.35 ~ 0.5", "A" => { "max" => "4.10" }, "b" => "0.8 ~ 0.2", "L" => "4.0 ~ 0.5" },
+        }.collect do |name, spec|
+            next IPC7351::Crystal.new(name, spec, @settings, @env)
         end
     end
 
@@ -339,12 +365,14 @@ renderers = [ IPC7351::GedaPCB.new, renderer = IPC7351::SVG.new ]
             fpg.fusc,
             fpg.resc,
             fpg.sod,
+            fpg.sodfl,
             fpg.diom,
             fpg.sot,
             fpg.soic,
             fpg.soicw,
             fpg.tssop,
             fpg.qfp,
+            fpg.crystal,
             fpg.te_sm_x,
             fpg.ts_dbls,
         ].flatten)

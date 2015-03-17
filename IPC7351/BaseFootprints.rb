@@ -47,6 +47,15 @@ module IPC7351
                 @pads.add(pf_v.pads(ppr * 3 + 1, ppr, @spec["e"].nom, Geometry.side("left")))
             end
         end
+
+        module SOT223
+            def generate_pads
+                pfb  = PadFactory.new(@settings, @spec["E"], @spec["b"],  @spec["L"])
+                pft  = PadFactory.new(@settings, @spec["E"], @spec["b1"], @spec["L"])
+                @pads.add(pfb.pads(1,     @pins - 1, @spec["e"].nom, Geometry.side("bottom")))
+                @pads.add(pft.pads(@pins, 1,         @spec["e"].nom, Geometry.side("top")))
+            end
+        end
     end
 
     module Silkscreen
@@ -166,7 +175,7 @@ module IPC7351
                     if @mark && pads[side.prev].first.num == 1
                         elements.push(Drawable.line(x1_mark, y, x2, y, lw).rotate_to(side))
                     elsif @mark && pads[side.next].first.num == 1
-                        lements.push(Drawable.line(x1, y, x2_mark, y, lw).rotate_to(side))
+                        elements.push(Drawable.line(x1, y, x2_mark, y, lw).rotate_to(side))
                     else
                         elements.push(Drawable.line(x1, y, x2, y, lw).rotate_to(side))
                     end
@@ -260,6 +269,18 @@ module IPC7351
         module InwardL
             def select_env
                 return Environment.new(@settings["environment"], "Inward Flat Ribbon L", :inward)
+            end
+        end
+
+        module UnderBodyOutwardL
+            def select_env
+                if @spec["A"].max <= 10
+                    env = "Under-Body Outward L Height <= 10mm"
+                else
+                    env = "Under-Body Outward L Height > 10mm"
+                end
+
+                return Environment.new(@settings["environment"], env)
             end
         end
     end

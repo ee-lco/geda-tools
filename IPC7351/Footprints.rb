@@ -79,7 +79,7 @@ module IPC7351
     class SODFL < Footprint
         include Silkscreen::Leaded
         include Pads::Dual
-        include Leads::GullWing
+        include Leads::FlatLead
 
         def initialize(can_name, spec, settings, env = nil)
             @can_name = can_name
@@ -140,6 +140,24 @@ module IPC7351
                 "RES"  => "R",
                 "FUS"  => "F",
             }[@type]
+            super()
+        end
+    end
+
+    class Crystal < Footprint
+        include Silkscreen::Leaded
+        include Pads::Dual
+        include Leads::UnderBodyOutwardL
+
+        def initialize(can_name, spec, settings, env = nil)
+            @can_name = can_name
+            @mark = false
+            super(spec, settings, env)
+        end
+
+        def generate_text
+            @ipc_name = "XTAL%dX%dX%dD%dL%d%s" % [f_x100(@spec["D1"]["nom"]), f_x100(@spec["E"]["nom"]), f_x100(@spec["A"]["max"]), f_x100(@spec["D"]["nom"]), f_x100(@spec["L"]["nom"]), @settings["environment"]]
+            @refdes = "Y"
             super()
         end
     end
