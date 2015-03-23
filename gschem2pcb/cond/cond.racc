@@ -1,0 +1,32 @@
+class CondParser
+rule
+    expression
+        : or_expression
+
+    primary_expression
+        : IDENTIFIER                            { return @defines.include? val[0] }
+        | LPAR expression RPAR                  { return val[1] }
+        ;
+
+    and_expression
+        : primary_expression
+        | and_expression AND primary_expression { return val[0] && val[2] }
+        ;
+
+    or_expression
+        : and_expression
+        | or_expression OR and_expression       { return val[0] || val[2] }
+        ;
+end
+
+---- header
+    require 'cond.lex'
+
+---- inner
+    def initialize(defines)
+        @defines = defines
+    end
+
+    def parse(text)
+        scan_str(text)
+    end
