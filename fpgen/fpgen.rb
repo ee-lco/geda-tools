@@ -1,4 +1,4 @@
-require 'IPC7351'
+require_relative 'IPC7351'
 
 
 class FPG
