@@ -51,6 +51,7 @@ function usage
             fab_idx=$(( ${fab_idx} + 1 ))
         done
     )
+    echo "                Default: elecrow"
     echo
     echo "    -o|--output The basename of for the output files."
     echo "                Example: \"./mydir/mypcb\" will generate files named "mypcb.\*""
@@ -62,7 +63,7 @@ function usage
 
 function generate
 {
-    # find the index of the requested fab
+    # find the requested fab
     read -a fabs
     fab_idx=1; while [ ${fab_idx} -lt ${#fabs[@]} -a "${fabs[$fab_idx]}" != "${fab}" ]; do
         fab_idx=$(( ${fab_idx} + 1 ))
@@ -105,7 +106,6 @@ function generate
 
 eval set -- `getopt -o f:o:c --long fab:,output:,clean -n "$0" -- "$@"`
 
-clean=0
 while [ "$1" != "--" ]; do
     case "$1" in
         -f|--fab)
@@ -123,10 +123,11 @@ input="$1"; shift
 if [ -n "$1" ]; then usage; exit 1; fi
 
 fab="${fab:-"elecrow"}"
-output="${output:-"${input%.pcb}-${fab}/$(basename ${input%.pcb})"}"
+output="${output:-"$(basename "${input%.pcb}")-${fab}/$(basename ${input%.pcb})"}"
 outdir=$(dirname ${output})
 outbase="$(basename ${output})"
-if [ ${clean} -ne 0 ]; then
+clean="${clean:-0}"
+if [ ${clean} -eq 1 ]; then
     if [ "${outdir}" != "." ]; then
         rm -rf "${outdir}"
     fi
