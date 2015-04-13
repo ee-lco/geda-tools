@@ -50,12 +50,12 @@ module IPC7351
             end
 
             def rotation_from(pos)
-                rot_ccw = Matrix[[ 0, -1,  0], [ 1,  0,  0], [  0,  0,  1]]
+                rot_ccw = Matrix[[ 0,  1,  0], [-1,  0,  0], [  0,  0,  1]]
                 return rotation(rot_ccw, pos)
             end
 
             def rotation_to(pos)
-                rot_cw = Matrix[[ 0,  1,  0], [-1,  0,  0], [  0,  0,  1]]
+                rot_cw = Matrix[[ 0, -1,  0], [ 1,  0,  0], [  0,  0,  1]]
                 return rotation(rot_cw, pos)
             end
 
@@ -94,9 +94,9 @@ module IPC7351
             end
         end
 
-        Side.new("bottom", Matrix[[ 1,  0,  0], [ 0,  1, -1], [ 0,  0,  1]], Matrix[[ 0, -1,  0]], Matrix[[ 1,  0,  0]])
+        Side.new("bottom", Matrix[[ 1,  0,  0], [ 0,  1,  1], [ 0,  0,  1]], Matrix[[ 0,  1,  0]], Matrix[[ 1,  0,  0]])
         Side.new("right",  Matrix[[ 1,  0,  1], [ 0,  1,  0], [ 0,  0,  1]], Matrix[[ 1,  0,  0]], Matrix[[ 0, -1,  0]])
-        Side.new("top",    Matrix[[ 1,  0,  0], [ 0,  1,  1], [ 0,  0,  1]], Matrix[[ 0,  1,  0]], Matrix[[-1,  0,  0]])
+        Side.new("top",    Matrix[[ 1,  0,  0], [ 0,  1, -1], [ 0,  0,  1]], Matrix[[ 0, -1,  0]], Matrix[[-1,  0,  0]])
         Side.new("left",   Matrix[[ 1,  0, -1], [ 0,  1,  0], [ 0,  0,  1]], Matrix[[-1,  0,  0]], Matrix[[ 0,  1,  0]])
         def self.sides
             return Sides
@@ -126,10 +126,10 @@ module IPC7351
             end
         end
 
-        Corner.new("bottom-left",  Matrix[[ 1,  0, -1], [ 0,  1, -1], [ 0,  0,  1]], side("left"),   side("bottom"))
-        Corner.new("bottom-right", Matrix[[ 1,  0,  1], [ 0,  1, -1], [ 0,  0,  1]], side("bottom"), side("right"))
-        Corner.new("top-right",    Matrix[[ 1,  0,  1], [ 0,  1,  1], [ 0,  0,  1]], side("right"),  side("top"))
-        Corner.new("top-left",     Matrix[[ 1,  0, -1], [ 0,  1,  1], [ 0,  0,  1]], side("top"),    side("left"))
+        Corner.new("bottom-left",  Matrix[[ 1,  0, -1], [ 0,  1,  1], [ 0,  0,  1]], side("left"),   side("bottom"))
+        Corner.new("bottom-right", Matrix[[ 1,  0,  1], [ 0,  1,  1], [ 0,  0,  1]], side("bottom"), side("right"))
+        Corner.new("top-right",    Matrix[[ 1,  0,  1], [ 0,  1, -1], [ 0,  0,  1]], side("right"),  side("top"))
+        Corner.new("top-left",     Matrix[[ 1,  0, -1], [ 0,  1, -1], [ 0,  0,  1]], side("top"),    side("left"))
         def self.corners
             return Corners
         end

@@ -76,13 +76,13 @@ module IPC7351
 
                     dims[side] = {}
 
-                    dims[side]["pads_inner"]     = pads[side].bounds.rotate_from(side).max.y if !pads[side].empty?
-                    dims[side]["pads_outer"]     = pads[side].bounds.rotate_from(side).min.y if !pads[side].empty?
-                    dims[side]["pads_outer_clr"] = pads[side].bounds.rotate_from(side).min.y  + lw / 2.0 if !pads[side].empty?
-                    cb = [-body.max.y]
-                    cb.push(pads[side.prev].bounds.expand(clr).rotate_from(side).min.y) if !pads[side.prev].empty?
-                    cb.push(pads[side.next].bounds.expand(clr).rotate_from(side).min.y) if !pads[side.next].empty?
-                    dims[side]["body_clr"] = cb.min
+                    dims[side]["pads_inner"]     = pads[side].bounds.rotate_from(side).min.y if !pads[side].empty?
+                    dims[side]["pads_outer"]     = pads[side].bounds.rotate_from(side).max.y if !pads[side].empty?
+                    dims[side]["pads_outer_clr"] = pads[side].bounds.rotate_from(side).max.y  - lw / 2.0 if !pads[side].empty?
+                    cb = [body.max.y]
+                    cb.push(pads[side.prev].bounds.expand(clr).rotate_from(side).max.y) if !pads[side.prev].empty?
+                    cb.push(pads[side.next].bounds.expand(clr).rotate_from(side).max.y) if !pads[side.next].empty?
+                    dims[side]["body_clr"] = cb.max
                 end
 
                 return dims
@@ -91,7 +91,7 @@ module IPC7351
             def mark_pin1(pad1, p1_y)
                 size  = @settings["silkscreen.dot"]
                 clr   = @settings["silkscreen.clearance"] + size / 2.0
-                p1_y -= clr
+                p1_y += clr
 
                 p1_x = pad1.c.rotate_from(pad1.pos).x
                 return [Drawable.circle(p1_x, p1_y, size / 2.0, :fill).rotate_to(pad1.pos)]
@@ -129,8 +129,8 @@ module IPC7351
 
                 y      =  dims[side]["body_clr"]
                 y_mark =  dims[side]["pads_outer_clr"]
-                x1     =  dims[side.prev]["body_clr"]
-                x2     = -dims[side.next]["body_clr"]
+                x1     = -dims[side.prev]["body_clr"]
+                x2     =  dims[side.next]["body_clr"]
 
                 if pads[side].empty?
                     elements.push(Drawable.line(x1, y, x2, y, lw).rotate_to(side))
@@ -167,10 +167,10 @@ module IPC7351
 
                 if pads[side].empty?
                     y       =  dims[side]["body_clr"]
-                    x1_mark =  dims[side.prev]["pads_outer_clr"]
-                    x1      =  dims[side.prev]["pads_inner"]
-                    x2      = -dims[side.prev]["pads_inner"]
-                    x2_mark = -dims[side.next]["pads_outer_clr"]
+                    x1_mark = -dims[side.prev]["pads_outer_clr"]
+                    x1      = -dims[side.prev]["pads_inner"]
+                    x2      =  dims[side.prev]["pads_inner"]
+                    x2_mark =  dims[side.next]["pads_outer_clr"]
 
                     if @mark && pads[side.prev].first.num == 1
                         elements.push(Drawable.line(x1_mark, y, x2, y, lw).rotate_to(side))

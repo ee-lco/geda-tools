@@ -84,7 +84,7 @@ module IPC7351
 
             num = first
             for i in 0...count
-                c   = Point.new((i - (count - 1) / 2.0) * pitch, -@c).rotate_to(pos)
+                c   = Point.new((i - (count - 1) / 2.0) * pitch, @c).rotate_to(pos)
                 dim = Point.new(@l, @w).rotate_to(pos)
                 l   = dim.x.abs
                 w   = dim.y.abs

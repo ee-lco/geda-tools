@@ -12,7 +12,7 @@ module IPC7351
 
         def render_polygon(poly)
             @io.puts %Q{\t\t<path d="M %s" style="fill:none;stroke-width:%.3f;stroke-linecap:round"/>} %
-                [poly.map { |p| "%.3f,%.3f" % [p.x, -p.y] }.join(" "), poly.lw]
+                [poly.map { |p| "%.3f,%.3f" % [p.x, p.y] }.join(" "), poly.lw]
         end
 
         def render_circle(circle)
@@ -24,8 +24,8 @@ module IPC7351
         end
 
         def render_pad(pad)
-            x =  pad.c.x - pad.l / 2.0
-            y = -pad.c.y - pad.w / 2.0
+            x = pad.c.x - pad.l / 2.0
+            y = pad.c.y - pad.w / 2.0
             @io.puts %Q{\t\t<rect width="%.3f" height="%.3f" x="%.3f" y="%.3f" style="stroke:none"/>} % [pad.l, pad.w, x, y]
         end
 
