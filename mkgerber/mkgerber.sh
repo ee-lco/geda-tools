@@ -3,16 +3,16 @@ set -e
 
 fab_specs="$(cat <<EOT
 -                   elecrow     oshpark
-.fab.gbr            :ignore     :ignore
+.fab.gbr            :rm         :rm
 .outline.gbr        .GML        .GKO
 .top.gbr            .GTL        .GTL
 .topmask.gbr        .GTS        .GTS
 .topsilk.gbr        .GTO        .GTO
-.toppaste.gbr       :ignore     :ignore
+.toppaste.gbr       :rm         :rm
 .bottom.gbr         .GBL        .GBL
 .bottommask.gbr     .GBS        .GBS
 .bottomsilk.gbr     .GBO        .GBO
-.bottompaste.gbr    :ignore     :ignore
+.bottompaste.gbr    :rm         :rm
 .group1.gbr         .GL2        .G2L
 .group2.gbr         .GL3        .G3L
 .group3.gbr         .GL4        .G4L
@@ -21,10 +21,10 @@ fab_specs="$(cat <<EOT
 .group6.gbr         .GL7        .G7L
 .group7.gbr         .GL8        .G8L
 .group8.gbr         .GL9        .G9L
-.plated-drill.cnc   -PTH.TXT    :ignore
-.unplated-drill.cnc -NPTH.TXT   :ignore
-.merged-drill.cnc   :ignore     .XLN
-README.TXT          :postproc   :ignore
+.plated-drill.cnc   -PTH.TXT    :rm
+.unplated-drill.cnc -NPTH.TXT   :rm
+.merged-drill.cnc   :rm         .XLN
+README.TXT          :postproc   :rm
 .zip                :zip        :zip
 EOT
 )"
@@ -91,14 +91,14 @@ function generate
         to="${xform[${fab_idx}]}"
         if [ "${to#:}" != "${to}" ]; then
             case "${to}" in
-                :ignore)    ;;
+                :rm)        rm -f ${from};;
                 :zip)       zip -qj ${output}.zip ${files[@]};;
                 :postproc)  eval "postproc-${fab}";;
                 *)          echo "Unknown special command: ${to}"; exit 1;;
             esac
         elif [ -e ${from} ]; then
             to="${output}${to}"
-            cp "${from}" "${to}"
+            mv "${from}" "${to}"
             files="${files[@]} ${to}"
         fi
     done
