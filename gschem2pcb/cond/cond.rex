@@ -7,13 +7,4 @@ rule
     [\w\d_-]+   { [:IDENTIFIER, text] }
     \s+
 
-inner
-    def tokenize(text)
-        scan_str(text)
-        tokens = []
-        while token = next_token
-            tokens << token
-        end
-        tokens
-    end
 end

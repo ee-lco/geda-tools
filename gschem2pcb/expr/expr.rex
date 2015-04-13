@@ -6,13 +6,4 @@ rule
             [^$]+       {               [:PASS, text] }
             \$          {               [:PASS, text] }
 
-inner
-    def tokenize(text)
-        scan_str(text)
-        tokens = []
-        while token = next_token
-            tokens << token
-        end
-        tokens
-    end
 end
