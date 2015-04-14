@@ -64,6 +64,7 @@ module IPC7351
         include Leads::GullWing
 
         def initialize(can_name, spec, settings, env = nil)
+            @type = "DIO"
             @can_name = can_name
             @mark = true
             super(spec, settings, env)
@@ -82,6 +83,7 @@ module IPC7351
         include Leads::FlatLead
 
         def initialize(can_name, spec, settings, env = nil)
+            @type = "DIO"
             @can_name = can_name
             @mark = true
             super(spec, settings, env)
