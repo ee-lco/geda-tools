@@ -395,23 +395,23 @@ static VALUE ruby_text_alignment_get(VALUE self)
 
     switch (object->text->alignment) {
     case LOWER_LEFT:
-        return ID2SYM(rb_intern(":lower_left"));
+        return ID2SYM(rb_intern("lower_left"));
     case MIDDLE_LEFT:
-        return ID2SYM(rb_intern(":middle_left"));
+        return ID2SYM(rb_intern("middle_left"));
     case UPPER_LEFT:
-        return ID2SYM(rb_intern(":upper_left"));
+        return ID2SYM(rb_intern("upper_left"));
     case LOWER_MIDDLE:
-        return ID2SYM(rb_intern(":lower_middle"));
+        return ID2SYM(rb_intern("lower_middle"));
     case MIDDLE_MIDDLE:
-        return ID2SYM(rb_intern(":middle_middle"));
+        return ID2SYM(rb_intern("middle_middle"));
     case UPPER_MIDDLE:
-        return ID2SYM(rb_intern(":upper_middle"));
+        return ID2SYM(rb_intern("upper_middle"));
     case LOWER_RIGHT:
-        return ID2SYM(rb_intern(":lower_right"));
+        return ID2SYM(rb_intern("lower_right"));
     case MIDDLE_RIGHT:
-        return ID2SYM(rb_intern(":middle_right"));
+        return ID2SYM(rb_intern("middle_right"));
     case UPPER_RIGHT:
-        return ID2SYM(rb_intern(":upper_right"));
+        return ID2SYM(rb_intern("upper_right"));
     default:
         ///@todo
         return Qnil;
@@ -426,23 +426,23 @@ static VALUE ruby_text_alignment_set(VALUE self, VALUE alignment)
 
     Check_Type(alignment, T_SYMBOL);
 
-    if (SYM2ID(alignment) == rb_intern(":lower_left")) {
+    if (SYM2ID(alignment) == rb_intern("lower_left")) {
         object->text->alignment = LOWER_LEFT;
-    } else if (SYM2ID(alignment) == rb_intern(":middle_left")) {
+    } else if (SYM2ID(alignment) == rb_intern("middle_left")) {
         object->text->alignment = MIDDLE_LEFT;
-    } else if (SYM2ID(alignment) == rb_intern(":upper_left")) {
+    } else if (SYM2ID(alignment) == rb_intern("upper_left")) {
         object->text->alignment = UPPER_LEFT;
-    } else if (SYM2ID(alignment) == rb_intern(":lower_middle")) {
+    } else if (SYM2ID(alignment) == rb_intern("lower_middle")) {
         object->text->alignment = LOWER_MIDDLE;
-    } else if (SYM2ID(alignment) == rb_intern(":middle_middle")) {
+    } else if (SYM2ID(alignment) == rb_intern("middle_middle")) {
         object->text->alignment = MIDDLE_MIDDLE;
-    } else if (SYM2ID(alignment) == rb_intern(":upper_middle")) {
+    } else if (SYM2ID(alignment) == rb_intern("upper_middle")) {
         object->text->alignment = UPPER_MIDDLE;
-    } else if (SYM2ID(alignment) == rb_intern(":lower_right")) {
+    } else if (SYM2ID(alignment) == rb_intern("lower_right")) {
         object->text->alignment = LOWER_RIGHT;
-    } else if (SYM2ID(alignment) == rb_intern(":middle_right")) {
+    } else if (SYM2ID(alignment) == rb_intern("middle_right")) {
         object->text->alignment = MIDDLE_RIGHT;
-    } else if (SYM2ID(alignment) == rb_intern(":upper_right")) {
+    } else if (SYM2ID(alignment) == rb_intern("upper_right")) {
         object->text->alignment = UPPER_RIGHT;
     } else {
         ///@todo
@@ -561,11 +561,11 @@ static VALUE ruby_text_attrib_mode_get(VALUE self)
 
     switch (object->show_name_value) {
     case SHOW_NAME:
-        return ID2SYM(rb_intern(":name"));
+        return ID2SYM(rb_intern("name"));
     case SHOW_VALUE:
-        return ID2SYM(rb_intern(":value"));
+        return ID2SYM(rb_intern("value"));
     case SHOW_NAME_VALUE:
-        return ID2SYM(rb_intern(":both"));
+        return ID2SYM(rb_intern("both"));
     default:
         ///@todo
         return Qnil;
@@ -580,11 +580,11 @@ static VALUE ruby_text_attrib_mode_set(VALUE self, VALUE show)
 
     Check_Type(show, T_SYMBOL);
 
-    if (SYM2ID(show) == rb_intern(":name")) {
+    if (SYM2ID(show) == rb_intern("name")) {
         object->show_name_value = SHOW_NAME;
-    } else if (SYM2ID(show) == rb_intern(":value")) {
+    } else if (SYM2ID(show) == rb_intern("value")) {
         object->show_name_value = SHOW_VALUE;
-    } else if (SYM2ID(show) == rb_intern(":both")) {
+    } else if (SYM2ID(show) == rb_intern("both")) {
         object->show_name_value = SHOW_NAME_VALUE;
     } else {
         ///@todo
