@@ -35,6 +35,7 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.20.0], ,
 PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= 2.18.0], ,
   AC_MSG_ERROR([GDK_PIXBUF 2.18.0 or later is required.]))
 
+PKG_CHECK_MODULES(GUILE, [guile-2.0])
 
 AC_CONFIG_FILES([
     Makefile
