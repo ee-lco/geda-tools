@@ -6,6 +6,8 @@ def pinmap(component, oldpin, newpin)
             attrib = pin.attribs.find { |attrib| attrib.name == "pinnumber" }
             if attrib
                 attrib.value = newpin
+                attrib.visible = true
+                attrib.attrib_mode = :value
             end
         end
     end
