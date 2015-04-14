@@ -920,9 +920,9 @@ void ruby_object_init(void)
     rb_define_method(ruby_text_class, "string=", ruby_text_string_set, 1);
     rb_define_method(ruby_text_class, "size", ruby_text_size_get, 0);
     rb_define_method(ruby_text_class, "visible?", ruby_text_visible_get, 0);
-    rb_define_method(ruby_text_class, "visible=", ruby_text_visible_get, 1);
+    rb_define_method(ruby_text_class, "visible=", ruby_text_visible_set, 1);
     rb_define_method(ruby_text_class, "attrib_mode", ruby_text_attrib_mode_get, 0);
-    rb_define_method(ruby_text_class, "attrib_mode=", ruby_text_attrib_mode_get, 1);
+    rb_define_method(ruby_text_class, "attrib_mode=", ruby_text_attrib_mode_set, 1);
 
     ruby_attrib_module = rb_define_module_under(ruby_geda_module, "Attrib");
     rb_define_method(ruby_attrib_module, "name", ruby_attrib_name_get, 0);
