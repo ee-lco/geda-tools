@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative '../gEDA'
+require 'libgedaruby'
 
 $options = {}
 $options[:paths] = []

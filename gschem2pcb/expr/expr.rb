@@ -1,4 +1,4 @@
-require_relative '../gEDA'
+require 'libgedaruby'
 require_relative 'expr.tab'
 
 parser = ExprParser.new
