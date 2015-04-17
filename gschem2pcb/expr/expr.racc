@@ -18,7 +18,7 @@ rule
 end
 
 ---- header
-    require 'expr.lex'
+    require_relative 'expr.lex'
 
 ---- inner
     def parse(component, text)

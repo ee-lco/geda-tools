@@ -20,7 +20,7 @@ rule
 end
 
 ---- header
-    require 'cond.lex'
+    require_relative 'cond.lex'
 
 ---- inner
     def initialize(defines)

@@ -1,5 +1,5 @@
-require 'gEDA'
-require 'expr.tab'
+require_relative '../gEDA'
+require_relative 'expr.tab'
 
 parser = ExprParser.new
 

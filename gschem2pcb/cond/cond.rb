@@ -1,6 +1,6 @@
-require 'gEDA'
 require 'optparse'
-require 'cond.tab'
+require_relative '../gEDA'
+require_relative 'cond.tab'
 
 $options = {}
 $options[:defines] = []

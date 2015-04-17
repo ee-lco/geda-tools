@@ -1,4 +1,4 @@
-require 'gEDA'
+require_relative '../gEDA'
 
 def pinmap(component, oldpin, newpin)
     component.contents.select { |object| object.is_a? GEDA::Pin}.each do |pin|

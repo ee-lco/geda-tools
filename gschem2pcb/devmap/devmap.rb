@@ -1,5 +1,5 @@
-require 'gEDA'
 require 'optparse'
+require_relative '../gEDA'
 
 $options = {}
 $options[:paths] = []
