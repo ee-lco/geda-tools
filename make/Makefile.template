@@ -1,0 +1,26 @@
+###############################################################################
+PROJECT         = <name>
+
+GEDATOOLS_DIR   = <geda-tools path>
+GEDALIB_DIR     = <geda-lib path>
+
+COND_DEFS       = <defines for cond.rb>
+
+###############################################################################
+PCB            ?= $(PCB_DIR)$(PROJECT).pcb
+SCHS           ?= $(SCH_DIR)$(PROJECT).sch
+BOM            ?= $(BOM_DIR)$(PROJECT).csv
+ELECROW        ?= $(GERBER_DIR)$(PROJECT)-elecrow/$(PROJECT).zip
+OSHPARK        ?= $(GERBER_DIR)$(PROJECT)-oshpark/$(PROJECT).zip
+
+PCB_DIR        ?= ./pcb/
+SCH_DIR        ?= ./sch/
+GERBER_DIR     ?= ./gerber/
+BOM_DIR        ?= ./bom/
+
+SYM_DIRS       ?= $(GEDALIB_DIR)sym/
+DEV_DIRS       ?= $(GEDALIB_DIR)dev/
+FP_DIRS        ?= $(GEDALIB_DIR)fp/
+
+###############################################################################
+include $(GEDATOOLS_DIR)make/gedaflow.mk
