@@ -296,10 +296,10 @@ class FPG
         }
         d.keys.collect do |pins|
             spec = {
-                "D"    => { "nom" => d[pins],        "tol" => 0.20 },
-                "D1"   => { "nom" => d[pins] - 2.00, "tol" => 0.20 },
-                "E"    => { "nom" => d[pins],        "tol" => 0.20 },
-                "E1"   => { "nom" => d[pins] - 2.00, "tol" => 0.20 },
+                "D"    => { "nom" => d[pins],        "tol" => 0.40 },
+                "D1"   => { "nom" => d[pins] - 2.00, "tol" => 0.40 },
+                "E"    => { "nom" => d[pins],        "tol" => 0.40 },
+                "E1"   => { "nom" => d[pins] - 2.00, "tol" => 0.40 },
                 "A"    => { "max" => "1.60" },
                 "A1"   => "0.05 ..  0.15",
                 "b"    => "0.17 ..  0.27",
