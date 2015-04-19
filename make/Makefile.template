@@ -1,6 +1,8 @@
 ###############################################################################
 PROJECT         = <name>
 
+LIB_DIR         = <local geda-lib path>
+
 GEDATOOLS_DIR   = <geda-tools path>
 GEDALIB_DIR     = <geda-lib path>
 
@@ -18,9 +20,9 @@ SCH_DIR        ?= ./sch/
 GERBER_DIR     ?= ./gerber/
 BOM_DIR        ?= ./bom/
 
-SYM_DIRS       ?= $(GEDALIB_DIR)sym/
-DEV_DIRS       ?= $(GEDALIB_DIR)dev/
-FP_DIRS        ?= $(GEDALIB_DIR)fp/
+SYM_DIRS       ?= $(LIB_DIR)sym/
+DEV_DIRS       ?= $(LIB_DIR)dev/
+FP_DIRS        ?= $(LIB_DIR)fp/
 
 ###############################################################################
 include $(GEDATOOLS_DIR)make/gedaflow.mk

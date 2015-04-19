@@ -25,15 +25,18 @@ PINMAP_FLAGS    =
 MKGERBER        = $(GEDATOOLS_DIR)mkgerber/mkgerber.sh
 
 ###############################################################################
+.DEFAULT_GOAL := pcb
+
 .SECONDARY:
 
 .DELETE_ON_ERROR:
 
 .PHONY: all
-all: pcb gerber bom
+all: lib pcb gerber bom
 
 .PHONY: clean
 clean:
+	cd $(LIB_DIR) && make -f $(GEDALIB_DIR)Makefile clean
 	cd $(PCB_DIR) && rm -f *.gsch2pcb *.new.pcb *.cmd* *.net *~ *~tmp*
 
 .PHONY: distclean
@@ -41,8 +44,13 @@ distclean: clean
 	cd $(PCB_DIR) && rm -f *.pcb.bak* *.pcb- *.sch
 
 ###############################################################################
+.PHONY: lib
+lib:
+	cd $(LIB_DIR) && make -f $(GEDALIB_DIR)Makefile
+
+###############################################################################
 .PHONY: pcb
-pcb: $(PCB_CMD)
+pcb: $(PCB_CMD) lib
 
 $(PCB_CMD): $(PCB_SCHS)
 
