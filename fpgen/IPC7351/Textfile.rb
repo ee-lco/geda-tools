@@ -22,7 +22,7 @@ module IPC7351
         end
 
         def render_pad(pad)
-            @io.puts %Q{\tPad: (#{@f}, #{@f}) - (#{@f}, #{@f})\n} % [pad.c.x, pad.c.y, pad.l, pad.w]
+            @io.puts %Q{\tPad: %d (#{@f}, #{@f}) - (#{@f}, #{@f})\n} % [pad.num, pad.c.x, pad.c.y, pad.l, pad.w]
         end
 
         def render_layer(layer)
