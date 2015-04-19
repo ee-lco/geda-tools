@@ -12,9 +12,9 @@ module IPC7351
         end
 
         def render_path(path)
-            path.each_cons(2) do |pair|
-                @io.puts %Q{\tLine: (#{@f}, #{@f}) - (#{@f}, #{@f})\n} % [pair[0].x, pair[0].y, pair[1].x, pair[1].y]
-            end
+            @io.print %Q{\tLine: }
+            path.each { |p| @io.print %Q{ (#{@f}, #{@f})} % [p.x, p.y] }
+            @io.puts
         end
 
         def render_circle(circle)
