@@ -4,6 +4,7 @@ module IPC7351
             def generate_pads
                 names = {
                     "DIO"  => ["C", "A"],
+                    "LED"  => ["C", "A"],
                 }[@type] || ["1", "2"]
 
                 pwl  = @spec.include?("b")  ? @spec["b"]  : @spec["E"]

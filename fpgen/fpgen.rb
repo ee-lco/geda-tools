@@ -70,6 +70,18 @@ class FPG
         end
     end
 
+    def ledc
+        # OSRAM
+        {
+            "0402" => { "D" => "0.90 .. 1.10", "E" => "0.40 .. 0.60", "A" => { "max" => "0.40" }, "L" => "0.15 .. 0.35" },
+            "0603" => { "D" => "1.50 .. 1.70", "E" => "0.70 .. 0.90", "A" => { "max" => "0.40" }, "L" => "0.30 .. 0.50" },
+            "0805" => { "D" => "1.90 .. 2.10", "E" => "1.15 .. 1.35", "A" => { "max" => "0.90" }, "L" => "0.30 .. 0.50" },
+            "1206" => { "D" => "3.10 .. 3.30", "E" => "1.50 .. 1.70", "A" => { "max" => "1.20" }, "L" => "0.40 .. 0.60" },
+        }.collect do |name, spec|
+            next IPC7351::Chip.new("LED", name, nil, spec, @settings, @env)
+        end
+    end
+
     def resc
         {
             "01005" => { "D" => "0.40 ~ 0.03", "E" => "0.20 ~ 0.03", "A" => { "max" => "0.15" }, "L" => "0.10 ~ 0.03" },
@@ -390,6 +402,7 @@ renderers = [ IPC7351::GedaPCB.new, IPC7351::SVG.new, IPC7351::Textfile.new ]
         renderer.save(*[
             fpg.capc,
             fpg.fusc,
+            fpg.ledc,
             fpg.resc,
             fpg.sod,
             fpg.sodfl,
