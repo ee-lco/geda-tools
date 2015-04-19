@@ -142,7 +142,7 @@ module IPC7351
                 @c = circle.c
                 @r = circle.r
                 @lw = circle.lw
-                fill = circle.fill?
+                @fill = circle.fill?
             else
                 @c = Point.new(args.shift)
                 @r = args.shift.to_f
