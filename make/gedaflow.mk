@@ -50,9 +50,9 @@ lib:
 
 ###############################################################################
 .PHONY: pcb
-pcb: $(PCB_CMD) lib
+pcb: $(PCB_CMD)
 
-$(PCB_CMD): $(PCB_SCHS)
+$(PCB_CMD): $(PCB_SCHS) lib
 
 %.cmd: %.pcb
 	$(GSCH2PCB) $(GSCH2PCB_FLAGS) -o $(basename $@) $(filter %.sch,$^)
@@ -83,7 +83,7 @@ $(PCB_CMD): $(PCB_SCHS)
 	pcb --action-script $@
 	@touch $@
 
-$(PCB_DIR)%.sch: $(SCH_DIR)%.sch
+$(PCB_DIR)%.sch: $(SCH_DIR)%.sch lib
 	@cp $< $@
 	gschlas -e $@
 	@mv $@ $@~tmp~
