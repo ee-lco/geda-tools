@@ -53,8 +53,9 @@ module IPC7351
         def copper
             rounding = [@settings["pads.rounding.placement"], @settings["pads.rounding.size"]]
             ["soldermask", "stencil", "copper"].each do |layer|
+                expansion = "%s.expansion" % [layer]
                 pads = @pads
-                pads = pads.expand(@settings["%s.expansion" % layer]) if @settings.include?("%s.expansion")
+                pads = pads.expand(@settings[expansion]) if @settings.include?(expansion)
                 pads = pads.sort
                 add_layer(layer, pads, *rounding)
             end
