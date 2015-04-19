@@ -15,8 +15,8 @@ module IPC7351
  
         def render_element(elt)
             case elt
-            when Polygon
-                render_polygon(elt)
+            when Path
+                render_path(elt)
             when Circle 
                 render_circle(elt)
             when Pad

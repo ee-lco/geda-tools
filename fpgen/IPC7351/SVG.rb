@@ -10,13 +10,13 @@ module IPC7351
             super(footprint, io, layers)
         end
 
-        def render_polygon(poly)
+        def render_path(path)
             @io.puts %Q{\t\t<path d="M %s" style="fill:none;stroke-width:%.3f;stroke-linecap:round"/>} %
-                [poly.map { |p| "%.3f,%.3f" % [p.x, p.y] }.join(" "), poly.lw]
+                [path.map { |p| "%.3f,%.3f" % [p.x, p.y] }.join(" "), path.lw]
         end
 
         def render_circle(circle)
-            if circle.fill
+            if circle.fill?
                 @io.puts %Q{\t\t<circle cx="%.3f" cy="%.3f" r="%.3f" style="stroke:none"/>} % [circle.c.x, circle.c.y, circle.r]
             else
                 @io.puts %Q{\t\t<circle cx="%.3f" cy="%.3f" r="%.3f" style="fill:none;stroke-width:%.3f;s"/>} % [circle.c.x, circle.c.y, circle.r, circle.lw]

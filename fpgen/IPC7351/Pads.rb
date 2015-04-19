@@ -1,23 +1,41 @@
 require 'forwardable'
+require_relative 'Cloneable'
+require_relative 'Roundable'
 
 module IPC7351
     class Pad
+        include Cloneable
+        include Boundable
+        include Roundable
         attr_reader :num, :name, :pos, :c, :l, :w
 
-        def initialize(num, name, pos, c, l, w)
-            @num, @name, @pos, @c, @l, @w = num, name, pos, c, l, w
+        def initialize(*args)
+            if args.first.is_a?(Pad)
+                pad = args.shift
+                @num, @name, @pos = [pad.num, pad.name, pad.pos]
+                @c, @l, @w = [pad.c, pad.l, pad.w]
+            else
+                @num, @name, @pos, @c, @l, @w = *args
+            end
         end
-        
+
+        def to_s
+            return "%s-%d @ %s %f-%f" % [@name, @num, @c, @l, @w]
+        end
+
         def expand(dx, dy = dx)
             return Pad.new(@num, @name, @pos, @c, @l + dx * 2, @w + dy * 2)
         end
 
-        def bounds
-             return Path.rectangle(@c, @l, @w).bounds
+        def loose_bounds
+            return Shape::rectangle(@c, @l, @w).loose_bounds
         end
 
-        def round(placement, size)
-            return Pad.new(@num, @name, @pos, @c, @l, @w)
+        def round!(placement, size)
+            @c = @c.round(placement)
+            @l = Roundable.round(@l, size)
+            @w = Roundable.round(@w, size)
+            return self
         end
     end
 
@@ -70,9 +88,9 @@ module IPC7351
             end
 
             rounding = settings.select("pads.rounding")
-            x = Geometry::round(x, rounding["size"])
-            y = Geometry::round(y, rounding["size"])
-            c = Geometry::round(c, rounding["placement"]) / 2.0
+            x = Roundable::round(x, rounding["size"])
+            y = Roundable::round(y, rounding["size"])
+            c = Roundable::round(c, rounding["placement"]) / 2.0
 
             return { "x" => x, "y" => y, "c" => c }
         end
@@ -105,6 +123,7 @@ module IPC7351
     class PadGroup
         include Enumerable
         extend Forwardable
+        include Boundable
         def_delegators :@pads, :[], :empty?, :include?, :length, :member?, :size
 
         def initialize
@@ -125,7 +144,7 @@ module IPC7351
             else
                 raise ArgumentError
             end
-            pads.each { |pad| @pads[pad.num] = pad.clone }
+            pads.each { |pad| @pads[pad.num] = Pad.new(pad) }
 
             return self
         end
@@ -142,8 +161,8 @@ module IPC7351
             return PadGroup.new.add(@pads.values.map { |pad| pad.expand(dx, dy) })
         end
 
-        def bounds
-            return Geometry::Bounds.new(@pads.values.map { |pad| pad.bounds })
+        def loose_bounds
+            return @pads.values.inject([]) { |bounds, pad| bounds += pad.loose_bounds }
         end
 
         def round(placement, size)

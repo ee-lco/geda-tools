@@ -1,4 +1,5 @@
 require 'matrix'
+require_relative 'Cloneable'
 require_relative 'Transformable'
 
 module IPC7351
@@ -136,47 +137,6 @@ module IPC7351
         def self.corner(*args)
             return Corner.instance(*args)
         end
-
-        class Bounds
-            include Transformable
-            attr_reader :min, :max
-
-            def initialize(*args)
-                x = []
-                y = []
-                args.flatten.each do |arg|
-                    case arg
-                    when Point
-                        x.push(arg.x)
-                        y.push(arg.y)
-                    when Path
-                        arg.each do |point|
-                            x.push(point.x)
-                            y.push(point.y)
-                        end
-                    when Bounds
-                        x.push(arg.min.x, arg.max.x)
-                        y.push(arg.min.y, arg.max.y)
-                    else
-                        raise ArgumentError
-                    end
-                end
-                @min = Point.new(x.min, y.min)
-                @max = Point.new(x.max, y.max)
-            end
-
-            def expand(dx, dy = dx)
-                return Bounds.new(Point.new(@min.x - dx, @min.y - dy), Point.new(@max.x + dx, @max.y + dy))
-            end
-
-            def transform(matrix)
-                return Bounds.new(@min.transform(matrix), @max.transform(matrix))
-            end
-        end
-
-        def self.round(val, prec)
-            return (val / prec).round * prec
-        end
-    end
+   end
 end
 

@@ -72,7 +72,7 @@ module IPC7351
             def get_dims(bl, bw, pads, clr, lw)
                 dims = {}
                 Geometry.sides.each do |side|
-                    body = Geometry::Bounds.new(Path.rectangle(bl, bw)).rotate_from(side)
+                    body = Shape::rectangle(bl, bw).bounds.rotate_from(side)
 
                     dims[side] = {}
 
@@ -94,7 +94,7 @@ module IPC7351
                 p1_y += clr
 
                 p1_x = pad1.c.rotate_from(pad1.pos).x
-                return [Drawable.circle(p1_x, p1_y, size / 2.0, :fill).rotate_to(pad1.pos)]
+                return [Shape::circle(p1_x, p1_y, size / 2.0, :fill).rotate_to(pad1.pos)]
             end
 
             def silkscreen
@@ -133,24 +133,24 @@ module IPC7351
                 x2     =  dims[side.next]["body_clr"]
 
                 if pads[side].empty?
-                    elements.push(Drawable.line(x1, y, x2, y, lw).rotate_to(side))
+                    elements.push(Shape::line(x1, y, x2, y, lw).rotate_to(side))
                 else
                     x1_mark = pads[side].bounds.expand(clr).rotate_from(side).min.x
                     x2_mark = pads[side].bounds.expand(clr).rotate_from(side).max.x
                     
                     if x1_mark - x1 >= min_line_length
-                        elements.push(Drawable.line(x1, y, x1_mark, y, lw).rotate_to(side))
+                        elements.push(Shape::line(x1, y, x1_mark, y, lw).rotate_to(side))
                     else
                         x1_mark = x1
                     end
                     if x2 - x2_mark >= min_line_length
-                        elements.push(Drawable.line(x2_mark, y, x2, y, lw).rotate_to(side))
+                        elements.push(Shape::line(x2_mark, y, x2, y, lw).rotate_to(side))
                     else
                         x2_mark = x2
                     end
                     if @mark && pads[side].include?(1)
-                        elements.push(Drawable.line(x1_mark, y, x1_mark, y_mark, lw).rotate_to(side)) if pads[side].sort.first.num == 1
-                        elements.push(Drawable.line(x2_mark, y, x2_mark, y_mark, lw).rotate_to(side)) if pads[side].sort.last.num  == 1
+                        elements.push(Shape::line(x1_mark, y, x1_mark, y_mark, lw).rotate_to(side)) if pads[side].sort.first.num == 1
+                        elements.push(Shape::line(x2_mark, y, x2_mark, y_mark, lw).rotate_to(side)) if pads[side].sort.last.num  == 1
                     end
                 end
 
@@ -173,11 +173,11 @@ module IPC7351
                     x2_mark =  dims[side.next]["pads_outer_clr"]
 
                     if @mark && pads[side.prev].first.num == 1
-                        elements.push(Drawable.line(x1_mark, y, x2, y, lw).rotate_to(side))
+                        elements.push(Shape::line(x1_mark, y, x2, y, lw).rotate_to(side))
                     elsif @mark && pads[side.next].first.num == 1
-                        elements.push(Drawable.line(x1, y, x2_mark, y, lw).rotate_to(side))
+                        elements.push(Shape::line(x1, y, x2_mark, y, lw).rotate_to(side))
                     else
-                        elements.push(Drawable.line(x1, y, x2, y, lw).rotate_to(side))
+                        elements.push(Shape::line(x1, y, x2, y, lw).rotate_to(side))
                     end
                 end
 
@@ -196,19 +196,19 @@ module IPC7351
                 x2 = -dims[side.next]["pads_inner"]
 
                 if pads[side].empty?
-                    elements.push(Drawable.line(x1, y, x2, y, lw).rotate_to(side))
+                    elements.push(Shape::line(x1, y, x2, y, lw).rotate_to(side))
                 else
                     x1_mark = bounds[side].expand(clr).rotate_from(side).min.x
                     x2_mark = bounds[side].expand(clr).rotate_from(side).max.x
                     
                     if x1_mark - x1 >= min_line_length
                         unless pads[side].sort.first.num == 1
-                            elements.push(Drawable.line(x1, y, x1_mark, y, lw).rotate_to(side))
+                            elements.push(Shape::line(x1, y, x1_mark, y, lw).rotate_to(side))
                         end
                     end
                     if x2 - x2_mark >= min_line_length
                         unless pads[side].sort.last.num == 1
-                            elements.push(Drawable.line(x2_mark, y, x2, y, lw).rotate_to(side))
+                            elements.push(Shape::line(x2_mark, y, x2, y, lw).rotate_to(side))
                         end
                     end
                 end

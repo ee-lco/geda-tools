@@ -11,14 +11,14 @@ module IPC7351
             super(footprint, io, layers)
         end
 
-        def render_polygon(poly)
-            poly.each_cons(2) do |pair|
-                @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [pair[0].x, pair[0].y, pair[1].x, pair[1].y, poly.lw]
+        def render_path(path)
+            path.each_cons(2) do |pair|
+                @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [pair[0].x, pair[0].y, pair[1].x, pair[1].y, path.lw]
             end
         end
 
         def render_circle(circle)
-            if circle.fill
+            if circle.fill?
                 @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [circle.c.x, circle.c.y, circle.c.x, circle.c.y, circle.r * 2]
             else
                 @io.puts %Q{\tElementArc[#{@f} #{@f} #{@f} #{@f} %d %d #{@f}]\n} % [circle.c.x, circle.c.y, circle.r, circle.r, 0, 360, circle.lw]

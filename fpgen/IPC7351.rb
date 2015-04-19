@@ -1,5 +1,6 @@
 ['Settings', 'Environments',
- 'MinMax', 'Transformable', 'Geometry', 'Path', 'Drawable',
+ 'Cloneable', 'Boundable', 'Roundable', 'Transformable',
+ 'MinMax', 'Geometry', 'Shape',
  'Pads', 'Layer', 'Footprint',
  'BaseFootprints', 'Footprints',
  'Renderer', 'GedaPCB', 'SVG',
