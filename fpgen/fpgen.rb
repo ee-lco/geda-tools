@@ -257,6 +257,26 @@ class FPG
         end
     end
 
+    def msop
+        # Texas Instruments DGK annd DGS packages
+        pin_specs = {
+             8 => { "e" => { "nom" => "0.65" }, "b" => "0.25 .. 0.38" },
+            10 => { "e" => { "nom" => "0.50" }, "b" => "0.17 .. 0.27" },
+        }
+        pin_specs.keys.collect do |pins|
+            spec = {
+                "D"    => "2.90 .. 3.10",
+                "E"    => "4.75 .. 5.05",
+                "E1"   => "2.90 .. 3.10",
+                "A"    => { "max" => "1.10" },
+                "A1"   => "0.05 ..  0.15",
+                "L"    => "0.50 ..  0.75",
+            }.merge(pin_specs[pins])
+            next IPC7351::SO.new("MSOP", "MSOP", pins, spec, @settings, @env)
+        end
+
+    end
+
     def qfp
         # ST QFP package
         d = {
@@ -371,6 +391,7 @@ renderers = [ IPC7351::GedaPCB.new, renderer = IPC7351::SVG.new ]
             fpg.soic,
             fpg.soicw,
             fpg.tssop,
+            fpg.msop
             fpg.qfp,
             fpg.crystal,
             fpg.te_sm_x,
