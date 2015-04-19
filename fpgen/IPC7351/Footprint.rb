@@ -1,4 +1,5 @@
 require 'forwardable'
+require_relative 'Layer'
 
 module IPC7351
     class Footprint

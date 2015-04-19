@@ -1,4 +1,10 @@
-require_relative 'IPC7351'
+require_relative 'IPC7351/Footprints'
+
+require_relative 'IPC7351/Environments'
+require_relative 'IPC7351/Settings'
+
+require_relative 'IPC7351/GedaPCB'
+require_relative 'IPC7351/SVG'
 
 
 class FPG
@@ -391,7 +397,7 @@ renderers = [ IPC7351::GedaPCB.new, renderer = IPC7351::SVG.new ]
             fpg.soic,
             fpg.soicw,
             fpg.tssop,
-            fpg.msop
+            fpg.msop,
             fpg.qfp,
             fpg.crystal,
             fpg.te_sm_x,

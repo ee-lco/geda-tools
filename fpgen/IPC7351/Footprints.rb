@@ -1,4 +1,7 @@
 require_relative 'BaseFootprints'
+require_relative 'Footprint'
+require_relative 'MinMax'
+require_relative 'Pads'
 
 module IPC7351
     class QFP < Footprint

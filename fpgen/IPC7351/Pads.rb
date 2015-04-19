@@ -1,6 +1,9 @@
 require 'forwardable'
 require_relative 'Cloneable'
+require_relative 'Boundable'
 require_relative 'Roundable'
+require_relative 'Geometry'
+require_relative 'Shape'
 
 module IPC7351
     class Pad
