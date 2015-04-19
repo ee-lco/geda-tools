@@ -6,7 +6,7 @@ module IPC7351
         include Enumerable
         extend Forwardable
         def_delegators :@layers, :[], :empty?, :include?, :length, :member?, :size
-        attr_reader :name, :filename, :refdes
+        attr_reader :name, :filename, :refdes, :settings
 
         def initialize(spec, settings, env)
             @spec = Hash[*spec.map { |key, value| [key, MinMax.new(value)] }.flatten]

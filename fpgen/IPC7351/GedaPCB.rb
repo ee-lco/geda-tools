@@ -31,7 +31,9 @@ module IPC7351
             y1 = pad.c.y - (pad.w - lw) / 2.0
             x2 = pad.c.x + (pad.l - lw) / 2.0
             y2 = pad.c.y + (pad.w - lw) / 2.0
-            @io.puts %Q{\tPad[#{@f} #{@f} #{@f} #{@f} #{@f} 0.250mm #{@f} "" "%s" "square"]\n} % [x1, y1, x2, y2, lw, lw, pad.name] ## @todo use solder mask expansion from settings
+            clearance = footprint.settings["pads.clearance.pad"] * 2
+            expansion = lw + footprint.settings["soldermask.expansion"] * 2
+            @io.puts %Q{\tPad[#{@f} #{@f} #{@f} #{@f} #{@f} #{@f} #{@f} "" "%s" "square"]\n} % [x1, y1, x2, y2, lw, clearance, expansion, pad.name]
         end
 
         def render_layer(footprint, layer)
