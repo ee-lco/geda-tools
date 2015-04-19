@@ -366,7 +366,7 @@ default_settings = IPC7351::Settings.new({
 
     "pads.rounding.size"        => 0.05,
     "pads.rounding.placement"   => 0.05,
-    "pads.clearance.pad"        => 0.15,
+    "pads.clearance.pad"        => 0.20,
     "pads.clearance.tab"        => 0.20,
 
     "copper.color"              => "#ff4040",
@@ -375,7 +375,7 @@ default_settings = IPC7351::Settings.new({
     "soldermask.expansion"      => 0.00,
 
     "stencil.color"             => "#2020ff",
-    "stencil.expansion"         => 0.00,
+    "stencil.expansion"         => -0.05,
 
     "silkscreen.color"          => "#ffffff",
     "silkscreen.rounding"       => 0.01,
