@@ -11,13 +11,13 @@ module IPC7351
             super(footprint, io, layers)
         end
 
-        def render_path(path)
+        def render_path(footprint, layer, path)
             path.each_cons(2) do |pair|
                 @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [pair[0].x, pair[0].y, pair[1].x, pair[1].y, path.lw]
             end
         end
 
-        def render_circle(circle)
+        def render_circle(footprint, layer, circle)
             if circle.fill?
                 @io.puts %Q{\tElementLine[#{@f} #{@f} #{@f} #{@f} #{@f}]\n} % [circle.c.x, circle.c.y, circle.c.x, circle.c.y, circle.r * 2]
             else
@@ -25,7 +25,7 @@ module IPC7351
             end
         end
 
-        def render_pad(pad)
+        def render_pad(footprint, layer, pad)
             lw = [pad.l, pad.w].min
             x1 = pad.c.x - (pad.l - lw) / 2.0
             y1 = pad.c.y - (pad.w - lw) / 2.0
@@ -34,9 +34,9 @@ module IPC7351
             @io.puts %Q{\tPad[#{@f} #{@f} #{@f} #{@f} #{@f} 0.250mm #{@f} "" "%s" "square"]\n} % [x1, y1, x2, y2, lw, lw, pad.name] ## @todo use solder mask expansion from settings
         end
 
-        def render_layer(layer)
+        def render_layer(footprint, layer)
             @io.puts %Q{\t# %s\n} % [layer.name]
-            super(layer)
+            super(footprint, layer)
         end
 
         def render_footprint(footprint, layers)

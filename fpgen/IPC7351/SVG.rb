@@ -10,12 +10,12 @@ module IPC7351
             super(footprint, io, layers)
         end
 
-        def render_path(path)
+        def render_path(footprint, layer, path)
             @io.puts %Q{\t\t<path d="M %s" style="fill:none;stroke-width:%.3f;stroke-linecap:round"/>} %
                 [path.map { |p| "%.3f,%.3f" % [p.x, p.y] }.join(" "), path.lw]
         end
 
-        def render_circle(circle)
+        def render_circle(footprint, layer, circle)
             if circle.fill?
                 @io.puts %Q{\t\t<circle cx="%.3f" cy="%.3f" r="%.3f" style="stroke:none"/>} % [circle.c.x, circle.c.y, circle.r]
             else
@@ -23,15 +23,15 @@ module IPC7351
             end
         end
 
-        def render_pad(pad)
+        def render_pad(footprint, layer, pad)
             x = pad.c.x - pad.l / 2.0
             y = pad.c.y - pad.w / 2.0
             @io.puts %Q{\t\t<rect width="%.3f" height="%.3f" x="%.3f" y="%.3f" style="stroke:none"/>} % [pad.l, pad.w, x, y]
         end
 
-        def render_layer(layer)
+        def render_layer(footprint, layer)
             @io.puts %Q{\t<g id="%s" style="stroke:%s;fill:%s">} % [layer.name, layer.color, layer.color]
-            super(layer)
+            super(footprint, layer)
             @io.puts %Q{\t</g>}
         end
 
