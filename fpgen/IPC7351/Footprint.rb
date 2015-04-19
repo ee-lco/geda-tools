@@ -65,11 +65,11 @@ module IPC7351
             lw       = @settings["courtyard.width"]
             clr      = @settings["courtyard.excess"]
 
-            body = Path.rectangle(@bl["max"], @bw["max"])
+            body = Shape.rectangle(@bl["max"], @bw["max"])
 
-            bounds = Geometry::Bounds.new(body.bounds, @pads.bounds).expand(clr)
+            bounds = Bounds.new(body.bounds, @pads.bounds).expand(clr)
 
-            add_layer("courtyard", [Drawable.rectangle(bounds.min, bounds.max, lw)])
+            add_layer("courtyard", [Shape.rectangle(bounds.min, bounds.max, lw)])
 
             return self
         end
@@ -101,7 +101,7 @@ module IPC7351
                 end
             end
 
-            add_layer("assembly", [Drawable.polygon(points, lw)])
+            add_layer("assembly", [Shape.polygon(*points, lw)])
 
             return self
         end
