@@ -29,7 +29,7 @@ module IPC7351
         end
 
         def add_layer(name, elements, *rounding)
-            rounding = [@settings["%s.rounding" % name]] if rounding.length == 0
+            rounding = [@settings["%s.rounding" % name]] if rounding.empty?
             layer = Layer.new(name, @settings["%s.color" % name], elements.map { |elt| elt.round(*rounding) })
             @layers.push(layer)
             return layer
@@ -64,13 +64,12 @@ module IPC7351
         def courtyard
             lw       = @settings["courtyard.width"]
             clr      = @settings["courtyard.excess"]
-            rounding = @settings["courtyard.rounding"]
 
             body = Path.rectangle(@bl["max"], @bw["max"])
 
             bounds = Geometry::Bounds.new(body.bounds, @pads.bounds).expand(clr)
 
-            add_layer("courtyard", [Drawable.rectangle(bounds.min, bounds.max, lw)], rounding)
+            add_layer("courtyard", [Drawable.rectangle(bounds.min, bounds.max, lw)])
 
             return self
         end
