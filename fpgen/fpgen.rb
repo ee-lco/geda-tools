@@ -5,6 +5,7 @@ require_relative 'IPC7351/Settings'
 
 require_relative 'IPC7351/GedaPCB'
 require_relative 'IPC7351/SVG'
+require_relative 'IPC7351/Textfile'
 
 
 class FPG
@@ -379,7 +380,7 @@ default_settings = IPC7351::Settings.new({
 })
 
 
-renderers = [ IPC7351::GedaPCB.new, renderer = IPC7351::SVG.new ]
+renderers = [ IPC7351::GedaPCB.new, IPC7351::SVG.new, IPC7351::Textfile.new ]
 
 ["L", "N", "M", "HS"].each do |env|
     settings = default_settings.strong_merge({ "environment" => env })
