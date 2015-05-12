@@ -10,6 +10,9 @@ GSCH2PCB_FLAGS  = $(foreach dir,$(FP_DIRS),-d $(dir))
 
 GSCHLAS         = gschlas
 
+RENUM           = ruby -I $(LIBGEDARUBY_DIR) $(GSCHEM2PCB_DIR)renum/renum.rb
+RENUM_FLAGS     =
+
 COND            = ruby -I $(LIBGEDARUBY_DIR) $(GSCHEM2PCB_DIR)cond/cond.rb
 COND_FLAGS      = $(foreach def,$(COND_DEFS),-D $(def))
 
