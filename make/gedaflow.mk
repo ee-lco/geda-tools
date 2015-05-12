@@ -55,7 +55,7 @@ pcb: $(PCB_CMD)
 $(PCB_CMD): $(PCB_SCHS) lib
 
 %.cmd: %.pcb
-	$(GSCH2PCB) $(GSCH2PCB_FLAGS) -o $(basename $@) $(filter %.sch,$^)
+	$(GSCH2PCB) $(GSCH2PCB_FLAGS) -o $(basename $@) $(firstword $(filter %.sch,$^))
 	@mv $@ $@~tmp~
 	@( \
 	    echo "LoadFrom(Layout, $<)"; \
