@@ -25,6 +25,9 @@ DEVMAP_FLAGS    = $(foreach dir,$(DEV_DIRS),-P $(dir))
 PINMAP          = ruby -I $(LIBGEDARUBY_DIR) $(GSCHEM2PCB_DIR)pinmap/pinmap.rb
 PINMAP_FLAGS    =
 
+MAKECHIP        = ruby $(GEDATOOLS_DIR)chipgen/chipgen.rb
+MAKECHIP_FLAGS  =
+
 MKGERBER        = $(GEDATOOLS_DIR)mkgerber/mkgerber.sh
 
 ###############################################################################
@@ -96,6 +99,9 @@ $(PCB_DIR)%.sch: $(SCH_DIR)%.sch lib
 	    | $(DEVMAP) $(DEVMAP_FLAGS) \
 	    | $(PINMAP) $(PINMAP_FLAGS) \
 	    > $@
+
+%.sym: %.pins
+	$(MAKECHIP) < $< > $@
 
 .PHONY: tag-pcb
 tag-pcb: $(PCB)
