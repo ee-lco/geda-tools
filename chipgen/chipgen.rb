@@ -23,8 +23,8 @@ class Pin
             puts "T %d %d 9 16 1 1 0 0 1" % [x +  50, y]
             puts "pinlabel=%s" % [@label]
             @af.each do |af|
-                puts "T %d %d 9 16 0 1 0 2 1" % [x + 50, y - 50]
-                puts "af=%s" % [af]
+                puts "T %d %d 9 16 %d 1 0 2 1" % [x + 50, y - 50, (af =~ /^\*/) ? 1 : 0]
+                puts "af=%s" % [af.gsub(/^\*/, "")]
             end
             puts "}"
         when "r"
@@ -39,8 +39,8 @@ class Pin
             puts "T %d %d 9 16 1 1 0 6 1" % [x -  50, y]
             puts "pinlabel=%s" % [@label]
             @af.each do |af|
-                puts "T %d %d 9 16 0 1 0 8 1" % [x - 50, y - 50]
-                puts "af=%s" % [af]
+                puts "T %d %d 9 16 %d 1 0 8 1" % [x - 50, y - 50, (af =~ /^\*/) ? 1 : 0]
+                puts "af=%s" % [af.gsub(/^\*/, "")]
             end
             puts "}"
         when "t"
@@ -55,8 +55,8 @@ class Pin
             puts "T %d %d 9 16 1 1 90 6 1" % [x, y - 50]
             puts "pinlabel=%s" % [@label]
             @af.each do |af|
-                puts "T %d %d 9 16 0 1 90 8 1" % [x + 50, y - 50]
-                puts "af=%s" % [af]
+                puts "T %d %d 9 16 %d 1 90 8 1" % [x + 50, y - 50, (af =~ /^\*/) ? 1 : 0]
+                puts "af=%s" % [af.gsub(/^\*/, "")]
             end
             puts "}"
         when "b"
@@ -70,9 +70,9 @@ class Pin
             puts "pinnumber=%s" % [@num]
             puts "T %d %d 9 16 1 1 90 0 1" % [x, y + 50]
             puts "pinlabel=%s" % [@label]
-            @af.each do |af|
-                puts "T %d %d 9 16 0 1 90 2 1" % [x + 50, y + 50]
-                puts "af=%s" % [af]
+            @af.each do |af|ruby regex
+                puts "T %d %d 9 16 %d 1 90 2 1" % [x + 50, y + 50, (af =~ /^\*/) ? 1 : 0]
+                puts "af=%s" % [af.gsub(/^\*/, "")]
             end
             puts "}"
         end
