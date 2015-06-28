@@ -141,5 +141,5 @@ $(BOM): $(PCB_SCHS)
 
 ###############################################################################
 .PHONY:release 
-release: tab-pcb gerber bom
+release: tag-pcb gerber bom
 
