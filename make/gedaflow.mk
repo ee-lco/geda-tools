@@ -138,3 +138,8 @@ $(BOM): $(PCB_SCHS)
 	@mkdir -p $(dir $@)
 	gnetlist -g bom2 -o - $(filter %.sch,$^) | sed 's/\(^\|:\)unknown\>/\1/g' > $@
 
+
+###############################################################################
+.PHONY:release 
+release: tab-pcb gerber bom
+
