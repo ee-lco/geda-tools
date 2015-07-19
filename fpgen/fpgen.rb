@@ -182,6 +182,26 @@ class FPG
         end
     end
 
+    def indm
+        {
+        # Vishay IHLP-3232CZ-01/11
+            "IHLP-3232CZ" => { "D" => "8.64 ~ 0.254", "E" => "8.18 ~ 0.076", "A" => { "max" => "3.0" }, "b" => "5.08 ~ 0.076", "L" => "1.372 ~ 0.318" },
+        }.collect do |name, spec|
+            next IPC7351::MoldedBody.new("IND", name, nil, spec, @settings, @env)
+        end
+    end
+
+    def ind_misc
+        {
+        # Bourns SRF0703A
+            #"SRF0703A" => { "D" => "7.5 ~ 0.1", "E" => "7.9 ~ 0.1", "E1" => "7.5 ~ 0.1", "A" => "3.4 ~ 0.2", "A1" => "0.0 .. 0.1", "b" => "0.95 ~ 0.05", "e" => { "nom" => "1.95" }, "L" => "2.5 ~ 0.25" },
+            "SRF0703A" => { "D" => "7.5 ~ 0.1", "E" => "8.9 ~ 0.1", "E1" => "7.5 ~ 0.1", "A" => "3.4 ~ 0.2", "A1" => "0.0 .. 0.1", "b" => "1.20 ~ 0.05", "e" => { "nom" => "1.90" }, "L" => "3.0 ~ 0.25" },
+        }.collect do |name, spec|
+            next IPC7351::SO.new("IND", name, 4, spec, @settings, @env)
+        end
+    end
+
+
     def sot
         # Texas Instruments DBV package
         # Note: D of SOT23-3 is 2.80 .. 3.00
@@ -279,7 +299,8 @@ class FPG
     def msop
         # Texas Instruments DGK annd DGS packages
         pin_specs = {
-             8 => { "e" => { "nom" => "0.65" }, "b" => "0.25 .. 0.38" },
+             #8 => { "e" => { "nom" => "0.65" }, "b" => "0.25 .. 0.38" },
+             8 => { "e" => { "nom" => "0.65" }, "b" => "0.25 .. 0.30" },
             10 => { "e" => { "nom" => "0.50" }, "b" => "0.17 .. 0.27" },
         }
         pin_specs.keys.collect do |pins|
@@ -407,6 +428,8 @@ renderers = [ IPC7351::GedaPCB.new, IPC7351::SVG.new, IPC7351::Textfile.new ]
             fpg.sod,
             fpg.sodfl,
             fpg.diom,
+            fpg.indm,
+            fpg.ind_misc,
             fpg.sot,
             fpg.soic,
             fpg.soicw,
