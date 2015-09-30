@@ -30,6 +30,17 @@ MAKECHIP_FLAGS  =
 
 MKGERBER        = $(GEDATOOLS_DIR)mkgerber/mkgerber.sh
 
+PHOTO           = pcb -x png
+PHOTO_FLAGS     = --dpi 0 --x-max 1280 --only-visible --photo-mode
+# Elecrow
+PHOTO_FLAGS    += --photo-mask-colour green --photo-plating tinned
+PHOTO_FLAGS    += --photo-silk-colour white
+# OSHpark
+#PHOTO_FLAGS    += --photo-mask-colour purple --photo-plating gold 
+#PHOTO_FLAGS    += --photo-silk-colour white
+PHOTO_TOP_FLAGS =
+PHOTO_BOT_FLAGS = --photo-flip-x
+
 ###############################################################################
 .DEFAULT_GOAL := pcb
 
@@ -129,6 +140,18 @@ $(ELECROW): $(PCB) $(PCB_CMD)
 $(OSHPARK): $(PCB) $(PCB_CMD)
 	@mkdir -p $(dir $@)
 	$(MKGERBER) -f oshpark -o $(basename $@) $<
+
+###############################################################################
+.PHONY: photo
+photo: $(basename $(PCB))-top.png $(basename $(PCB))-bottom.png
+
+$(basename $(PCB))-top.png: $(PCB) $(PCB_CMD)
+	@mkdir -p $(dir $@)
+	$(PHOTO) $(PHOTO_FLAGS) $(PHOTO_TOP_FLAGS) --outfile $@ $<
+
+$(basename $(PCB))-bottom.png: $(PCB) $(PCB_CMD)
+	@mkdir -p $(dir $@)
+	$(PHOTO) $(PHOTO_FLAGS) $(PHOTO_BOT_FLAGS) --outfile $@ $<
 
 ###############################################################################
 .PHONY: bom
