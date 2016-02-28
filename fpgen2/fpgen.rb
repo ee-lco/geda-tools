@@ -19,10 +19,15 @@ $settings = {
 
   "terminal" =>
   {
-    "mask-dx"    => 0,
-    "mask-dy"    => 0,
-    "stencil-dx" => 0,
-    "stencil-dy" => 0,
+#    "mask-dx"    => 0,
+#    "mask-dy"    => 0,
+#    "stencil-dx" => 0,
+#    "stencil-dy" => 0,
+# test setings
+    "mask-dx"    => 0.1,
+    "mask-dy"    => 0.1,
+    "stencil-dx" => -0.1,
+    "stencil-dy" => -0.1,
 
     "fabrication-tol"        => 0.050,
     "placement-tol"          => 0.025,
@@ -51,7 +56,7 @@ $settings = {
 
 class PadStack
   extend Forwardable
-  def_delegators :@layers, :[], :[]=
+  def_delegators :@layers, :[], :[]=, :each
 
   def initialize
     @layers = {}
@@ -327,14 +332,94 @@ private
   end
 end
 
+class Text
+  def render(basename, ps)
+    filename = "%s.txt" % [basename]
+
+    txt = File.new(filename, "w")
+
+    txt.printf("%s => {\n", basename)
+
+    ps.each do |name, object|
+      txt.printf("  %s => {\n", name)
+
+      object.each do |attr, value|
+        if value.respond_to?(:to_f)
+          txt.printf("    %s: %.3f\n", attr, value.to_f)
+        else
+          txt.printf("    %s: %s\n", attr, value)
+        end
+      end
+      txt.printf("  }\n");
+    end
+    txt.printf("}\n");
+  end
+end
+
 class SVG
   #include REXML
   #include XRVG
 
-  def render(ps)
-    svg = ""
+  def render(basename, ps)
+    filename = "%s.svg" % [basename]
 
-    
+    svg = File.new(filename, "w")
+
+    svg.printf(%Q{<?xml version="1.0" encoding="UTF-8"?>\n})
+    svg.printf(%Q{<svg width="20cm" height="20cm" viewBox="-10 -10 20 20" preserveAspectRatio="xMidYMid" style="fill:#000000">\n})
+    svg.printf(%Q{  <g id="background" style="fill:#000000"><rect width="20" height="20" x="-10" y="-10" style="stroke:none"/>\n})
+
+    ps.each do |name, object|
+      svg.printf(%Q{  <g id="%s" style="stroke:#ff0000;fill:#00ffff">\n}, name)
+
+      x = object["x"] || 0
+      y = object["y"] || x
+
+      case object["shape"]
+      when :round
+        svg.printf(%Q{    <circle cx="0" cy="0" r="%.3f"/>\n}, x)
+      when :square, :rectangle
+        svg.printf(%Q{    <rect x="%.3f" y="%.3f" width="%.3f" height="%.3f"/>\n},
+          -x / 2.0, -y / 2.0, x, y)
+      end
+      svg.printf(%Q{  </g>\n})
+    end
+
+    svg.printf(%Q{</svg>\n})
+  end
+end
+
+class Gerber
+  def render(basename, ps)
+    ps.each do |name, object|
+      #next if name == "hole"
+
+      filename = "%s.%s.gbr" % [basename, name]
+      gerber = File.new(filename, "w")
+      gerber.printf("%%FSLAX25Y25*%%\n")
+      gerber.printf("%%MOMM*%%\n")
+
+      x = object["x"] || 0
+      y = object["y"] || x
+      # aperture size
+      a = [x, y].min
+
+      case object["shape"]
+      when :round, :oblong
+        gerber.printf("%%ADD10O,%.3fX%.3f*%%\n", x, y)
+        #gerber.printf("%%ADD10C,%.3f*%%\n", a)
+      when :square, :rectangle
+        gerber.printf("%%ADD10R,%.3fX%.3f*%%\n", x, y)
+        #gerber.printf("%%ADD10R,%.3fX%.3f*%%\n", a, a)
+      else
+        $stderr.printf("Gerber (%s): skipping %s\n", filename, object)
+        next
+      end
+      gerber.printf("D10*\n")
+      gerber.printf("X000000Y000000D03*\n")
+      #gerber.printf("X%dY%dD02X%dY%dD01*\n", -(x - a) / 2.0 * 100000, -(y - a) / 2.0 * 100000, +(x - a) / 2.0 * 100000, +(y - a) / 2.0 * 100000)
+      gerber.printf("M02*\n")
+    end
   end
 end
 
@@ -342,8 +427,13 @@ spsf = SmdPadStackFactory.new
 tpsf = ThtPadStackFactory.new
 ipsf = IpcPadStackFactory.new
 smd = spsf.make_smd(:rectangle, 2, 1)
-tht = tpsf.make_tht(:round, 2)
+tht = tpsf.make_tht(:round, 0.5)
 ipc = ipsf.make_ipc(Tolerance.new(10, 10.65), Tolerance.new(0.33, 0.51), Tolerance.new(0.40, 1.27))
 
+txt = Text.new
 svg = SVG.new
-puts svg.render(smd)
+gbr = Gerber.new
+[txt, svg, gbr].each do |rdr|
+  rdr.render("testout/smd", smd)
+  rdr.render("testout/tht", tht)
+end
