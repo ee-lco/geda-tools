@@ -228,8 +228,8 @@ private
 
     make_layer(
       hole["shape"],
-      [hole["x"] * ratio, min].max,
-      [hole["y"] * ratio, min].max,
+      [hole["x"] * ratio, hole["x"] + min].max,
+      [hole["y"] * ratio, hole["y"] + min].max,
     )
   end
 
