@@ -60,7 +60,7 @@ module FPGen
     def_delegators :@layers, :[], :[]=, :each
 
     def initialize
-      @layers = {}
+      @layers = Hash.new
     end
 
     def name
@@ -182,7 +182,7 @@ module FPGen
       ps["top-pad"] = ps["inner-pad"] = ps["bottom-pad"] = pad
       ps["top-mask"] = ps["bottom-mask"] = make_mask(pad)
       ps["thermal"] = thermal
-      ps["anti-pad"] =anti_pad
+      ps["anti-pad"] = anti_pad
 
       ps
     end
