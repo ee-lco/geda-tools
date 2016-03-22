@@ -322,8 +322,13 @@ static VALUE ruby_text_alloc(VALUE class)
     OBJECT *object;
 
     toplevel = ruby_get_c_toplevel();
+#if 0
     object = o_text_new(toplevel, OBJ_TEXT, DEFAULT_COLOR, 0, 0, LOWER_LEFT, 0,
                         "", 10, VISIBLE, SHOW_NAME_VALUE);
+#else
+    object = geda_text_object_new(toplevel, DEFAULT_COLOR, 0, 0, LOWER_LEFT, 0,
+                        "", 10, VISIBLE, SHOW_NAME_VALUE);
+#endif
 
     return ruby_object_from_c(object);
 }

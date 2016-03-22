@@ -284,7 +284,11 @@ static VALUE ruby_page_write(VALUE self)
     toplevel = ruby_get_c_toplevel();
     page = ruby_page_to_c(self);
 
+#if 0
     string = o_save_buffer(toplevel, s_page_objects(page));
+#else
+    string = geda_object_list_to_buffer(s_page_objects(page));
+#endif
 
     return rb_str_new2(string);
 }
