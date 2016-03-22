@@ -7,6 +7,7 @@
 extern VALUE ruby_geda_module;
 void ruby_geda_init(void);
 
+void ruby_toplevel_init(void);
 TOPLEVEL *ruby_get_c_toplevel(void);
 
 extern VALUE ruby_page_class;
