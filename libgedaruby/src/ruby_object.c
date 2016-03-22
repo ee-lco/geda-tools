@@ -227,7 +227,7 @@ static VALUE ruby_object_copy(VALUE self)
     object = ruby_object_to_c(self);
     copy = o_object_copy(toplevel, object);
 
-    return ruby_object_from_(copy);
+    return ruby_object_from_c(copy);
 }
 
 static VALUE ruby_object_component_get(VALUE self)
