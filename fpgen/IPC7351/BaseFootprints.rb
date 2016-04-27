@@ -18,22 +18,32 @@ module IPC7351
 
         module DualRow
             def generate_pads
-                case @pins
-                when 3
-                    pins         = 6
-                    names_bottom = ["1", nil, "2"]
-                    names_top    = [nil, "3", nil]
-                when 5
-                    pins  = 6
-                    names_bottom = ["1", "2", "3"]
-                    names_top    = ["4", nil, "5"]
+                pwb = pwt = @spec["b"]
+
+                if @spec.include?("b1")
+                  pwt = @spec["b1"]
+                  ppb = @pins - 1
+                  ppt = 1
                 else
-                    pins  = @pins
+                    case @pins
+                    when 3
+                        pins         = 6
+                        names_bottom = ["1", nil, "2"]
+                        names_top    = [nil, "3", nil]
+                    when 5
+                        pins  = 6
+                        names_bottom = ["1", "2", "3"]
+                        names_top    = ["4", nil, "5"]
+                    else
+                        pins  = @pins
+                    end
+                    ppb = ppt = pins / 2
                 end
-                pf   = PadFactory.new(@settings, @spec["E"], @spec["b"], @spec["L"])
-                ppr  = pins / 2
-                @pads.add(pf.pads(1,       ppr, @spec["e"].nom, Geometry.side("bottom"), names_bottom))
-                @pads.add(pf.pads(ppr + 1, ppr, @spec["e"].nom, Geometry.side("top"),    names_top))
+
+                pfb = PadFactory.new(@settings, @spec["E"], pwb, @spec["L"])
+                pft = PadFactory.new(@settings, @spec["E"], pwt, @spec["L"])
+                @pads.add(pfb.pads(1,       ppb, @spec["e"].nom, Geometry.side("bottom"), names_bottom))
+                @pads.add(pft.pads(ppb + 1, ppt, @spec["e"].nom, Geometry.side("top"),    names_top))
             end
         end
 

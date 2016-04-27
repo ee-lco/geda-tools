@@ -186,6 +186,10 @@ class FPG
         {
         # Vishay IHLP-3232CZ-01/11
             "IHLP-3232CZ" => { "D" => "8.64 ~ 0.254", "E" => "8.18 ~ 0.076", "A" => { "max" => "3.0" }, "b" => "5.08 ~ 0.076", "L" => "1.372 ~ 0.318" },
+        # Coilcraft XFL4020
+            "XFL4020" => { "D" => "4.0 ~ 0.3", "E" => "4.0 ~ 0.3", "A" => { "max" => "2.10" }, "b" => "3.26 ~ 0.20", "L" => "1.0 ~ 0.125" },
+        # Bourns SRN6045
+            "SRN6045" => { "D" => "6.0 ~ 0.2", "E" => "6.0 ~ 0.2", "A" => { "max" => "4.50" }, "b" => "6.00 ~ 0.20", "L" => "1.6 ~ 0.20" },
         }.collect do |name, spec|
             next IPC7351::MoldedBody.new("IND", name, nil, spec, @settings, @env)
         end
@@ -196,11 +200,12 @@ class FPG
         # Bourns SRF0703A
             #"SRF0703A" => { "D" => "7.5 ~ 0.1", "E" => "7.9 ~ 0.1", "E1" => "7.5 ~ 0.1", "A" => "3.4 ~ 0.2", "A1" => "0.0 .. 0.1", "b" => "0.95 ~ 0.05", "e" => { "nom" => "1.95" }, "L" => "2.5 ~ 0.25" },
             "SRF0703A" => { "D" => "7.5 ~ 0.1", "E" => "8.9 ~ 0.1", "E1" => "7.5 ~ 0.1", "A" => "3.4 ~ 0.2", "A1" => "0.0 .. 0.1", "b" => "1.20 ~ 0.05", "e" => { "nom" => "1.90" }, "L" => "3.0 ~ 0.25" },
+        # Coilcraft MSD7342
+            "MSD7342" =>  { "D" => "7.4 ~ 0.1", "E" => "7.4 ~ 0.1", "E1" => "7.4 ~ 0.1", "A" => "4.5 ~ 0.1", "A1" => "0.0 .. 0.1", "b" => "0.95 ~ 0.05", "e" => { "nom" => "1.70" }, "L" => "1.8 ~ 0.25" },
         }.collect do |name, spec|
             next IPC7351::SO.new("IND", name, 4, spec, @settings, @env)
         end
     end
-
 
     def sot
         # Texas Instruments DBV package
@@ -217,6 +222,24 @@ class FPG
                 "L"    => "0.30 .. 0.55",
             }
             next IPC7351::SO.new("SOT", "SOT23", pins, spec, @settings, @env)
+        end
+    end
+
+    def sot223
+        # Texas Instruments DCY package
+        [4].collect do |pins|
+            spec = {
+                "D"    => "6.30 .. 6.70",
+                "E"    => "6.70 .. 7.30",
+                "E1"   => "3.30 .. 3.70",
+                "A"    => { "max" => "1.80" },
+                "A1"   => "0.00 .. 0.25",
+                "b"    => "0.66 .. 0.84",
+                "b1"   => "2.90 .. 3.10",
+                "e"    => { "nom" => "2.30" },
+                "L"    => "0.75 .. 1.27",
+            }
+            next IPC7351::SO.new("SOT", "SOT223", pins, spec, @settings, @env)
         end
     end
 
@@ -431,6 +454,7 @@ renderers = [ IPC7351::GedaPCB.new, IPC7351::SVG.new, IPC7351::Textfile.new ]
             fpg.indm,
             fpg.ind_misc,
             fpg.sot,
+            fpg.sot223,
             fpg.soic,
             fpg.soicw,
             fpg.tssop,
