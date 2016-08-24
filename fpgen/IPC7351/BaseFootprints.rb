@@ -21,9 +21,11 @@ module IPC7351
                 pwb = pwt = @spec["b"]
 
                 if @spec.include?("b1")
-                  pwt = @spec["b1"]
-                  ppb = @pins - 1
-                  ppt = 1
+                  # SOT-223
+                  pwt       = @spec["b1"]
+                  ppb       = @pins - 1
+                  ppt       = 1
+                  names_top = ["2"] ##@todo this ain't pretty
                 else
                     case @pins
                     when 3
