@@ -243,6 +243,23 @@ class FPG
         end
     end
 
+    def sot363
+        # Texas Instruments DCK package
+        [4].collect do |pins|
+            spec = {
+                "D"    => "1.85 .. 2.15",
+                "E"    => "1.80 .. 2.40",
+                "E1"   => "1.10 .. 1.40",
+                "A"    => { "max" => "1.10" },
+                "A1"   => "0.00 .. 0.10",
+                "b"    => "0.15 .. 0.30",
+                "e"    => { "nom" => "0.65" },
+                "L"    => "0.26 .. 0.46",
+            }
+            next IPC7351::SO.new("SOT", "SOT363", pins, spec, @settings, @env)
+        end
+    end
+
     def soic
         # Texas Instruments D package
         d = {
@@ -375,6 +392,15 @@ class FPG
         end
     end
 
+    def vish_wsr
+        # Vishay WSR2/3/5
+        {
+            "WSR" => { "D" => "11.56 ~ 0.813", "D1" =>  "10.56 ~ 0.813", "E" => "6.98 ~ 0.127", "A" => "2.41 ~ 1.27", "b" => "5.46 ~ 1.27", "L" => "2.54 ~ 0.254" },
+        }.collect do |name, spec|
+            next IPC7351::MoldedBody.new("RES", name, nil, spec, @settings, @env)
+        end
+    end
+
     def te_sm_x
         # TE Connectivity SM_2, _3, _5
         {
@@ -455,12 +481,14 @@ renderers = [ IPC7351::GedaPCB.new, IPC7351::SVG.new, IPC7351::Textfile.new ]
             fpg.ind_misc,
             fpg.sot,
             fpg.sot223,
+            fpg.sot363,
             fpg.soic,
             fpg.soicw,
             fpg.tssop,
             fpg.msop,
             fpg.qfp,
             fpg.crystal,
+            fpg.vish_wsr,
             fpg.te_sm_x,
             fpg.ts_dbls,
         ].flatten)
