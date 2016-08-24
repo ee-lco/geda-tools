@@ -245,7 +245,7 @@ class FPG
 
     def sot363
         # Texas Instruments DCK package
-        [4].collect do |pins|
+        [6].collect do |pins|
             spec = {
                 "D"    => "1.85 .. 2.15",
                 "E"    => "1.80 .. 2.40",
